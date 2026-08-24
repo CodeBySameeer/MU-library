@@ -22,10 +22,7 @@ const DATA = {
                 { code: "ME411", name: "Engineering Drawing I" },
                 { code: "ME412", name: "Workshop Technology" },
                 { code: "CE412", name: "Construction Materials" },
-                {
-                  code: "CO411",
-                  name: "Basic Computer Concept and Programming",
-                },
+                { code: "CO411", name: "Basic Computer Concept and Programming" },
               ],
             },
             {
@@ -35,10 +32,7 @@ const DATA = {
                 { code: "CE421", name: "Applied Mechanics II (Dynamics)" },
                 { code: "SH422", name: "Engineering Chemistry" },
                 { code: "ME421", name: "Engineering Drawing II" },
-                {
-                  code: "ME422",
-                  name: "Fundamental of Thermodynamics and Heat Transfer",
-                },
+                { code: "ME422", name: "Fundamental of Thermodynamics and Heat Transfer" },
                 { code: "EL421", name: "Basic Electrical Engineering" },
                 { code: "EX421", name: "Basic Electronics Engineering" },
               ],
@@ -51,10 +45,7 @@ const DATA = {
                 { code: "CE432", name: "Fluid Mechanics" },
                 { code: "CE433", name: "Surveying I" },
                 { code: "CE434", name: "Engineering Geology" },
-                {
-                  code: "CE435",
-                  name: "Building Construction and Building Drawings",
-                },
+                { code: "CE435", name: "Building Construction and Building Drawings" },
                 { code: "SH432", name: "Communication English" },
               ],
             },
@@ -66,10 +57,7 @@ const DATA = {
                 { code: "CE442", name: "Surveying II" },
                 { code: "CE443", name: "Hydraulics" },
                 { code: "CE444", name: "Soil Mechanics" },
-                {
-                  code: "CE445",
-                  name: "Concrete Technology and Masonry Structures",
-                },
+                { code: "CE445", name: "Concrete Technology and Masonry Structures" },
                 { code: "CO441", name: "Numerical Methods" },
               ],
             },
@@ -78,10 +66,7 @@ const DATA = {
               subjects: [
                 { code: "CE451", name: "Theory of Structures II" },
                 { code: "CE452", name: "Survey Camp" },
-                {
-                  code: "CE453",
-                  name: "Water Supply and Sanitary Engineering",
-                },
+                { code: "CE453", name: "Water Supply and Sanitary Engineering" },
                 { code: "MS451", name: "Engineering Economics" },
                 { code: "CE454", name: "Foundation Engineering" },
                 { code: "CE455", name: "Transportation Engineering I" },
@@ -91,10 +76,7 @@ const DATA = {
             {
               semester: 6,
               subjects: [
-                {
-                  code: "CE461",
-                  name: "Design of Steel and Timber Structures",
-                },
+                { code: "CE461", name: "Design of Steel and Timber Structures" },
                 { code: "CE462", name: "Transportation Engineering II" },
                 { code: "CE463", name: "Irrigation Engineering" },
                 { code: "CE464", name: "Sanitation Engineering" },
@@ -112,10 +94,7 @@ const DATA = {
                 { code: "CE473", name: "Estimating and Valuation" },
                 { code: "CE47*", name: "Elective II" },
                 { code: "CE47*", name: "Elective III" },
-                {
-                  code: "CE474",
-                  name: "Design of Reinforced Cement Concrete Structures",
-                },
+                { code: "CE474", name: "Design of Reinforced Cement Concrete Structures" },
               ],
             },
             {
@@ -517,9 +496,7 @@ function showSuggestions(results, targetBox) {
   });
   targetBox.innerHTML = html;
   targetBox.classList.add("active");
-  currentSuggestionItems = targetBox.querySelectorAll(
-    ".search-suggestion-item"
-  );
+  currentSuggestionItems = targetBox.querySelectorAll('.search-suggestion-item');
   highlightedSuggestionIndex = -1;
 }
 
@@ -608,7 +585,7 @@ function handleSuggestionClick(type, key, pathJson) {
 
 function debounce(fn, delay) {
   let timer;
-  return function (...args) {
+  return function(...args) {
     clearTimeout(timer);
     timer = setTimeout(() => fn.apply(this, args), delay);
   };
@@ -623,8 +600,8 @@ const handleSearchInput = debounce((value) => {
       showSuggestions(results, suggestionsBox);
     }
   } else {
-    suggestionsBox.classList.remove("active");
-    mobileSuggestionsBox.classList.remove("active");
+    suggestionsBox.classList.remove('active');
+    mobileSuggestionsBox.classList.remove('active');
   }
 }, 300);
 
@@ -634,9 +611,7 @@ searchInput.addEventListener("input", (e) => {
   handleSearchInput(value);
 });
 
-searchInput.addEventListener("blur", () =>
-  setTimeout(() => suggestionsBox.classList.remove("active"), 300)
-);
+searchInput.addEventListener("blur", () => setTimeout(() => suggestionsBox.classList.remove("active"), 300));
 
 mobileSearchInput.addEventListener("input", (e) => {
   const value = e.target.value;
@@ -644,18 +619,12 @@ mobileSearchInput.addEventListener("input", (e) => {
   handleSearchInput(value);
 });
 
-mobileSearchInput.addEventListener("blur", () =>
-  setTimeout(() => mobileSuggestionsBox.classList.remove("active"), 300)
-);
+mobileSearchInput.addEventListener("blur", () => setTimeout(() => mobileSuggestionsBox.classList.remove("active"), 300));
 
-searchInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") triggerGlobalSearch();
-});
-mobileSearchInput.addEventListener("keydown", (e) => {
-  if (e.key === "Enter") triggerGlobalSearch();
-});
+searchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") triggerGlobalSearch(); });
+mobileSearchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") triggerGlobalSearch(); });
 
-document.addEventListener("keydown", (e) => {
+document.addEventListener('keydown', (e) => {
   const isDesktopSearchFocused = document.activeElement === searchInput;
   const isMobileSearchFocused = document.activeElement === mobileSearchInput;
   if (!isDesktopSearchFocused && !isMobileSearchFocused) return;
@@ -663,17 +632,15 @@ document.addEventListener("keydown", (e) => {
   const items = currentSuggestionItems;
   if (items.length === 0) return;
 
-  if (e.key === "ArrowDown") {
+  if (e.key === 'ArrowDown') {
     e.preventDefault();
-    highlightedSuggestionIndex =
-      (highlightedSuggestionIndex + 1) % items.length;
+    highlightedSuggestionIndex = (highlightedSuggestionIndex + 1) % items.length;
     highlightSuggestion(highlightedSuggestionIndex);
-  } else if (e.key === "ArrowUp") {
+  } else if (e.key === 'ArrowUp') {
     e.preventDefault();
-    highlightedSuggestionIndex =
-      (highlightedSuggestionIndex - 1 + items.length) % items.length;
+    highlightedSuggestionIndex = (highlightedSuggestionIndex - 1 + items.length) % items.length;
     highlightSuggestion(highlightedSuggestionIndex);
-  } else if (e.key === "Enter") {
+  } else if (e.key === 'Enter') {
     e.preventDefault();
     if (highlightedSuggestionIndex >= 0) {
       items[highlightedSuggestionIndex].click();
@@ -685,7 +652,7 @@ document.addEventListener("keydown", (e) => {
 
 function highlightSuggestion(index) {
   currentSuggestionItems.forEach((item, i) => {
-    item.style.background = i === index ? "var(--bg-hover)" : "";
+    item.style.background = i === index ? 'var(--bg-hover)' : '';
   });
 }
 
@@ -699,10 +666,7 @@ function triggerGlobalSearch() {
       const item = results[0];
       handleSuggestionClick(item.type, item.key, JSON.stringify(item.path));
     } else if (results.length > 1) {
-      showSuggestions(
-        results,
-        isMobile ? mobileSuggestionsBox : suggestionsBox
-      );
+      showSuggestions(results, isMobile ? mobileSuggestionsBox : suggestionsBox);
       input.focus();
     } else {
       alert("No results found. Try a different keyword.");
@@ -711,23 +675,16 @@ function triggerGlobalSearch() {
 }
 
 // Recent searches
-let recentSearches = JSON.parse(
-  localStorage.getItem("muRecentSearches") || "[]"
-);
+let recentSearches = JSON.parse(localStorage.getItem('muRecentSearches') || '[]');
 
 function saveRecentSearch(query) {
-  recentSearches = [query, ...recentSearches.filter((q) => q !== query)].slice(
-    0,
-    5
-  );
-  localStorage.setItem("muRecentSearches", JSON.stringify(recentSearches));
+  recentSearches = [query, ...recentSearches.filter(q => q !== query)].slice(0, 5);
+  localStorage.setItem('muRecentSearches', JSON.stringify(recentSearches));
 }
 
 function showRecentSearches(targetBox) {
   if (recentSearches.length === 0) return;
-  targetBox.innerHTML = recentSearches
-    .map(
-      (q) => `
+  targetBox.innerHTML = recentSearches.map(q => `
     <div class="search-suggestion-item" onclick="useRecentSearch('${q}')">
       <div class="suggestion-icon"><i class="fas fa-history"></i></div>
       <div class="suggestion-info">
@@ -735,10 +692,8 @@ function showRecentSearches(targetBox) {
         <div class="suggestion-meta"><span class="tag">Recent</span></div>
       </div>
     </div>
-  `
-    )
-    .join("");
-  targetBox.classList.add("active");
+  `).join('');
+  targetBox.classList.add('active');
 }
 
 function useRecentSearch(q) {
@@ -749,10 +704,10 @@ function useRecentSearch(q) {
   saveRecentSearch(q);
 }
 
-searchInput.addEventListener("focus", () => {
+searchInput.addEventListener('focus', () => {
   if (!searchInput.value.trim()) showRecentSearches(suggestionsBox);
 });
-mobileSearchInput.addEventListener("focus", () => {
+mobileSearchInput.addEventListener('focus', () => {
   if (!mobileSearchInput.value.trim()) showRecentSearches(mobileSuggestionsBox);
 });
 
@@ -903,9 +858,7 @@ function renderContent() {
       : "";
 
   // Update header badge count
-  totalCount.textContent = `${items.length} ${levelNames[
-    currentLevel
-  ]?.toLowerCase()}`;
+  totalCount.textContent = `${items.length} ${levelNames[currentLevel]?.toLowerCase()}`;
 
   // Update Hero
   if (currentLevel === "faculties") {
@@ -916,42 +869,28 @@ function renderContent() {
     subtitleDisplay.textContent = "Mid-West University";
   } else if (currentLevel === "programs") {
     const faculty = getCurrentFacultyData();
-    heroTitle.innerHTML = `${
-      faculty?.name || "Programs"
-    } <br /><span class="gradient-text">Explore Programs</span>`;
-    heroSubtext.textContent = `Select a program under ${
-      faculty?.name || "this faculty"
-    }.`;
+    heroTitle.innerHTML = `${faculty?.name || "Programs"} <br /><span class="gradient-text">Explore Programs</span>`;
+    heroSubtext.textContent = `Select a program under ${faculty?.name || "this faculty"}.`;
     subtitleDisplay.textContent = faculty?.name || "Mid-West University";
   } else if (currentLevel === "semesters") {
     const program = getCurrentProgramData();
-    heroTitle.innerHTML = `${
-      program?.name || "Semesters"
-    } <br /><span class="gradient-text">Choose a Semester</span>`;
+    heroTitle.innerHTML = `${program?.name || "Semesters"} <br /><span class="gradient-text">Choose a Semester</span>`;
     heroSubtext.textContent = `Select a semester to view subjects.`;
     subtitleDisplay.textContent = program?.name || "Mid-West University";
   } else if (currentLevel === "subjects") {
     const semester = getCurrentSemesterData();
     const program = getCurrentProgramData();
-    heroTitle.innerHTML = `Semester ${
-      currentPath.semester
-    } <br /><span class="gradient-text">${program?.name || "Subjects"}</span>`;
+    heroTitle.innerHTML = `Semester ${currentPath.semester} <br /><span class="gradient-text">${program?.name || "Subjects"}</span>`;
     heroSubtext.textContent = `Select a subject to access resources.`;
-    subtitleDisplay.textContent = `${program?.name || ""} – Semester ${
-      currentPath.semester
-    }`;
+    subtitleDisplay.textContent = `${program?.name || ""} – Semester ${currentPath.semester}`;
   } else if (currentLevel === "resources") {
     const subject = currentPath.subject;
-    heroTitle.innerHTML = `${
-      subject?.name || "Subject"
-    } <br /><span class="gradient-text">Resources</span>`;
+    heroTitle.innerHTML = `${subject?.name || "Subject"} <br /><span class="gradient-text">Resources</span>`;
     heroSubtext.textContent = `Access syllabus, notes, past papers, and assignments.`;
     subtitleDisplay.textContent = subject?.name || "Mid-West University";
   }
 
-  footerStats.textContent = `${items.length} ${levelNames[
-    currentLevel
-  ]?.toLowerCase()}`;
+  footerStats.textContent = `${items.length} ${levelNames[currentLevel]?.toLowerCase()}`;
 
   if (items.length === 0 && currentLevel !== "resources") {
     cardGrid.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>No items found</h3></div>`;
@@ -963,21 +902,11 @@ function renderContent() {
   let backNav = contentArea.querySelector(".back-nav");
   if (backNav) backNav.remove();
   if (currentLevel !== "faculties") {
-    let backLabel = "",
-      backLevel = "";
-    if (currentLevel === "programs") {
-      backLabel = "Back to Faculties";
-      backLevel = "faculties";
-    } else if (currentLevel === "semesters") {
-      backLabel = "Back to Programs";
-      backLevel = "programs";
-    } else if (currentLevel === "subjects") {
-      backLabel = "Back to Semesters";
-      backLevel = "semesters";
-    } else if (currentLevel === "resources") {
-      backLabel = "Back to Subjects";
-      backLevel = "subjects";
-    }
+    let backLabel = "", backLevel = "";
+    if (currentLevel === "programs") { backLabel = "Back to Faculties"; backLevel = "faculties"; }
+    else if (currentLevel === "semesters") { backLabel = "Back to Programs"; backLevel = "programs"; }
+    else if (currentLevel === "subjects") { backLabel = "Back to Semesters"; backLevel = "semesters"; }
+    else if (currentLevel === "resources") { backLabel = "Back to Subjects"; backLevel = "subjects"; }
     backNav = document.createElement("div");
     backNav.className = "back-nav";
     backNav.innerHTML = `<button class="back-btn" onclick="navigateTo('${backLevel}')"><i class="fas fa-arrow-left"></i> ${backLabel}</button>`;
@@ -993,9 +922,7 @@ function renderContent() {
   items.forEach((item) => {
     let icon = item.icon || "fa-folder";
     let title = item.name || `Item ${item.id}`;
-    let subtitle = "",
-      badge = "",
-      onClick = "";
+    let subtitle = "", badge = "", onClick = "";
     if (currentLevel === "faculties") {
       subtitle = item.subtitle || "Faculty";
       badge = Object.keys(item.programs || {}).length + " Programs";
@@ -1015,25 +942,19 @@ function renderContent() {
       onClick = `navigateToResources('${item.id}')`;
     }
     html += `
-      <div class="card ${
-        currentLevel === "subjects" ? "subject-card" : ""
-      }" onclick="${onClick}">
+      <div class="card ${currentLevel === "subjects" ? "subject-card" : ""}" onclick="${onClick}">
         ${badge ? `<span class="card-badge">${badge}</span>` : ""}
         <div class="card-icon"><i class="fas ${icon}"></i></div>
         <div class="card-title">${title}</div>
         ${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ""}
-        ${
-          currentLevel === "subjects"
-            ? `
+        ${currentLevel === "subjects" ? `
           <div class="card-tags">
             <span>📘 Syllabus</span>
             <span>📝 Notes</span>
             <span>📄 PYQs</span>
             <span>📋 Assignments</span>
           </div>
-        `
-            : ""
-        }
+        ` : ""}
       </div>
     `;
   });
@@ -1056,68 +977,46 @@ function renderResources() {
         <div class="resource-header"><i class="fas fa-book-open"></i><h4>Syllabus</h4></div>
         <p>${resources.syllabus}</p>
         <div class="btn-group">
-            <button class="btn-download" onclick="openResourceModal('syllabus','${
-              subject.code
-            }','${subject.name}','${resources.syllabusPdf || ""}')">
+            <button class="btn-download" onclick="openResourceModal('syllabus','${subject.code}','${subject.name}','${resources.syllabusPdf || ''}')">
                 <i class="fas fa-eye"></i> View
             </button>
-            <button class="btn-download download" onclick="downloadResource('syllabus','${
-              subject.code
-            }','${subject.name}','${resources.syllabusPdf || ""}')">
+            <button class="btn-download download" onclick="downloadResource('syllabus','${subject.code}','${subject.name}','${resources.syllabusPdf || ''}')">
                 <i class="fas fa-download"></i> Download
             </button>
         </div>
     </div>
     <div class="card resource-card">
         <div class="resource-header"><i class="fas fa-file-alt"></i><h4>Notes</h4></div>
-        <ul>${resources.notes
-          .map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`)
-          .join("")}</ul>
+        <ul>${resources.notes.map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`).join("")}</ul>
         <div class="btn-group">
-            <button class="btn-download" onclick="openResourceModal('notes','${
-              subject.code
-            }','${subject.name}','${resources.notesPdf || ""}')">
+            <button class="btn-download" onclick="openResourceModal('notes','${subject.code}','${subject.name}','${resources.notesPdf || ''}')">
                 <i class="fas fa-eye"></i> View
             </button>
-            <button class="btn-download download" onclick="downloadResource('notes','${
-              subject.code
-            }','${subject.name}','${resources.notesPdf || ""}')">
+            <button class="btn-download download" onclick="downloadResource('notes','${subject.code}','${subject.name}','${resources.notesPdf || ''}')">
                 <i class="fas fa-download"></i> Download
             </button>
         </div>
     </div>
     <div class="card resource-card">
         <div class="resource-header"><i class="fas fa-file-pdf"></i><h4>Past Year Questions</h4></div>
-        <ul>${resources.pyq
-          .map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`)
-          .join("")}</ul>
+        <ul>${resources.pyq.map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`).join("")}</ul>
         <div class="btn-group">
-            <button class="btn-download" onclick="openResourceModal('pyq','${
-              subject.code
-            }','${subject.name}','${resources.pyqPdf || ""}')">
+            <button class="btn-download" onclick="openResourceModal('pyq','${subject.code}','${subject.name}','${resources.pyqPdf || ''}')">
                 <i class="fas fa-eye"></i> View
             </button>
-            <button class="btn-download download" onclick="downloadResource('pyq','${
-              subject.code
-            }','${subject.name}','${resources.pyqPdf || ""}')">
+            <button class="btn-download download" onclick="downloadResource('pyq','${subject.code}','${subject.name}','${resources.pyqPdf || ''}')">
                 <i class="fas fa-download"></i> Download
             </button>
         </div>
     </div>
     <div class="card resource-card">
         <div class="resource-header"><i class="fas fa-tasks"></i><h4>Assignments</h4></div>
-        <ul>${resources.assignments
-          .map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`)
-          .join("")}</ul>
+        <ul>${resources.assignments.map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`).join("")}</ul>
         <div class="btn-group">
-            <button class="btn-download" onclick="openResourceModal('assignments','${
-              subject.code
-            }','${subject.name}','${resources.assignmentsPdf || ""}')">
+            <button class="btn-download" onclick="openResourceModal('assignments','${subject.code}','${subject.name}','${resources.assignmentsPdf || ''}')">
                 <i class="fas fa-eye"></i> View
             </button>
-            <button class="btn-download download" onclick="downloadResource('assignments','${
-              subject.code
-            }','${subject.name}','${resources.assignmentsPdf || ""}')">
+            <button class="btn-download download" onclick="downloadResource('assignments','${subject.code}','${subject.name}','${resources.assignmentsPdf || ''}')">
                 <i class="fas fa-download"></i> Download
             </button>
         </div>
@@ -1133,32 +1032,23 @@ function generateResourceContent(subject) {
   let syllabusText = `Complete syllabus as per the latest curriculum.`;
   const name = subject.name;
   if (name.includes("Mathematics") || name.includes("Maths"))
-    syllabusText =
-      "Calculus, algebra, differential equations, transforms, and numerical methods.";
+    syllabusText = "Calculus, algebra, differential equations, transforms, and numerical methods.";
   else if (name.includes("Programming") || name.includes("Data Structures"))
-    syllabusText =
-      "Algorithms, data structures, OOP, and software development fundamentals.";
+    syllabusText = "Algorithms, data structures, OOP, and software development fundamentals.";
   else if (name.includes("Hydraulics") || name.includes("Fluid"))
-    syllabusText =
-      "Fluid properties, statics, dynamics, pipe flow, and open channel hydraulics.";
+    syllabusText = "Fluid properties, statics, dynamics, pipe flow, and open channel hydraulics.";
   else if (name.includes("Database") || name.includes("DBMS"))
-    syllabusText =
-      "SQL, normalization, transaction management, and database design.";
+    syllabusText = "SQL, normalization, transaction management, and database design.";
   else if (name.includes("Networks") || name.includes("CN"))
-    syllabusText =
-      "OSI model, TCP/IP, routing, switching, and network security.";
+    syllabusText = "OSI model, TCP/IP, routing, switching, and network security.";
   else if (name.includes("Machine Learning") || name.includes("AI"))
-    syllabusText =
-      "Supervised/unsupervised learning, neural networks, NLP, and computer vision.";
+    syllabusText = "Supervised/unsupervised learning, neural networks, NLP, and computer vision.";
   else if (name.includes("Dam") || name.includes("Turbine"))
-    syllabusText =
-      "Dam types, design, turbine selection, and powerhouse layout.";
+    syllabusText = "Dam types, design, turbine selection, and powerhouse layout.";
   else if (name.includes("Management") || name.includes("Business"))
-    syllabusText =
-      "Management principles, OB, marketing, finance, and business strategy.";
+    syllabusText = "Management principles, OB, marketing, finance, and business strategy.";
   else if (name.includes("Physics"))
-    syllabusText =
-      "Mechanics, electromagnetism, thermodynamics, quantum physics, and optics.";
+    syllabusText = "Mechanics, electromagnetism, thermodynamics, quantum physics, and optics.";
 
   const topics = [
     "Introduction & fundamental concepts",
@@ -1183,8 +1073,8 @@ function generateResourceContent(subject) {
   ];
 
   const pdfMap = {
-    CE411_notes: "resources/applied_mechanics-I_note.pdf",
-    SH421_syllabus: "resources/mathematics-II_syllabus.pdf",
+    "CE411_notes": "resources/applied_mechanics-I_note.pdf",
+    "SH421_syllabus": "resources/mathematics-II_syllabus.pdf",
   };
 
   const getPdfUrl = (type) => {
@@ -1220,9 +1110,7 @@ function openResourceModal(type, code, name, pdfUrl = null) {
     for (let i = 1; i <= 5; i++) {
       pagesHtml += `
         <div class="pdf-page">
-          <h4>${name} – ${
-        type.charAt(0).toUpperCase() + type.slice(1)
-      } (Page ${i})</h4>
+          <h4>${name} – ${type.charAt(0).toUpperCase() + type.slice(1)} (Page ${i})</h4>
           <p>This is page ${i} of the ${type} document for ${name}. Here you can add detailed content, diagrams, or explanations related to the topic. The content is currently simulated but can be replaced with actual PDF pages or images.</p>
         </div>
       `;
@@ -1230,27 +1118,25 @@ function openResourceModal(type, code, name, pdfUrl = null) {
     body.innerHTML = `<div class="pdf-scroll-container">${pagesHtml}</div>`;
   }
 
-  title.textContent = `${name} (${code}) - ${
-    type.charAt(0).toUpperCase() + type.slice(1)
-  }`;
+  title.textContent = `${name} (${code}) - ${type.charAt(0).toUpperCase() + type.slice(1)}`;
   modal.style.display = "flex";
 }
 
 function downloadResource(type, code, name, pdfUrl = null) {
   if (pdfUrl && pdfUrl.trim() !== "") {
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = pdfUrl;
-    a.download = `${name.replace(/\s+/g, "_")}_${type}.pdf`;
+    a.download = `${name.replace(/\s+/g, '_')}_${type}.pdf`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
   } else {
     const content = `Resource: ${name} (${code})\nType: ${type}\nThis is a simulated download. Replace with actual file.`;
-    const blob = new Blob([content], { type: "text/plain" });
+    const blob = new Blob([content], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = url;
-    a.download = `${name.replace(/\s+/g, "_")}_${type}.txt`;
+    a.download = `${name.replace(/\s+/g, '_')}_${type}.txt`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -1262,11 +1148,9 @@ function closeResourceModal() {
   document.getElementById("resourceModal").style.display = "none";
 }
 
-document
-  .getElementById("resourceModal")
-  .addEventListener("click", function (e) {
-    if (e.target === this) closeResourceModal();
-  });
+document.getElementById("resourceModal").addEventListener("click", function(e) {
+  if (e.target === this) closeResourceModal();
+});
 
 // ================================================================
 //  BREADCRUMB & NAVIGATION
@@ -1556,15 +1440,9 @@ window.addEventListener("resize", () => {
 });
 
 // Focus trap
-sidebar.addEventListener("keydown", (e) => {
-  if (
-    e.key === "Tab" &&
-    window.innerWidth <= 768 &&
-    sidebar.classList.contains("open")
-  ) {
-    const focusable = sidebar.querySelectorAll(
-      'button, a, input, [tabindex]:not([tabindex="-1"])'
-    );
+sidebar.addEventListener('keydown', (e) => {
+  if (e.key === 'Tab' && window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+    const focusable = sidebar.querySelectorAll('button, a, input, [tabindex]:not([tabindex="-1"])');
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
     if (e.shiftKey && document.activeElement === first) {
@@ -1580,11 +1458,11 @@ sidebar.addEventListener("keydown", (e) => {
 // Swipe gestures
 let touchStartX = 0;
 let touchEndX = 0;
-const mainContent = document.querySelector(".main-content");
-mainContent.addEventListener("touchstart", (e) => {
+const mainContent = document.querySelector('.main-content');
+mainContent.addEventListener('touchstart', (e) => {
   touchStartX = e.changedTouches[0].screenX;
 });
-mainContent.addEventListener("touchend", (e) => {
+mainContent.addEventListener('touchend', (e) => {
   touchEndX = e.changedTouches[0].screenX;
   const swipeDistance = touchEndX - touchStartX;
   if (swipeDistance > 80) {
@@ -1647,12 +1525,8 @@ if (window.location.hash) {
 
 console.log("📚 MU Library – Fully Loaded!");
 console.log("🏛️ Faculties:", Object.keys(DATA.faculties).join(", "));
-console.log(
-  "🔍 Search: Works on both desktop and mobile with live suggestions."
-);
+console.log("🔍 Search: Works on both desktop and mobile with live suggestions.");
 console.log("📐 Sidebar: Collapse button is always visible at top-right.");
 console.log("🌓 Dark mode: Click the moon/sun icon in the header.");
 console.log("📱 Mobile: Use hamburger menu and close (×) button.");
-console.log(
-  "📄 PDFs: Integrated for Applied Mechanics I (Notes) and Mathematics II (Syllabus)."
-);
+console.log("📄 PDFs: Integrated for Applied Mechanics I (Notes) and Mathematics II (Syllabus).");
