@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MU Library – Mid-West University</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800;14..32,900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="media.css" />
+</head>
+<body>
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside class="sidebar" id="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-brand">
+            <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div>
+                <h1>MU <span>Library</span></h1>
+                <p id="subtitleDisplay">Mid-West University</p>
+            </div>
+            <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-label" id="navLabel"><i class="fas fa-th-large"></i> <span id="navLabelText">Faculties</span></div>
+            <div id="navList"></div>
+        </nav>
+        <div class="sidebar-footer">
+            <i class="fas fa-database"></i> <span id="footerStats">Multi-Faculty Repository</span>
+        </div>
+        <button class="sidebar-collapse-btn" id="sidebarToggle" title="Toggle sidebar" aria-label="Toggle sidebar collapse">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="breadcrumb" id="breadcrumb">
+                    <span class="breadcrumb-item active" data-level="faculties">🏛️ Faculties</span>
+                </div>
+                <h1 id="heroTitle">Welcome to <br /><span class="gradient-text">MU Digital Library</span></h1>
+                <p class="hero-subtext" id="heroSubtext">
+                    Use the search bar above or browse via the sidebar.
+                </p>
+                <!-- No hero stats here -->
+            </div>
+        </section>
+
+        <!-- Header Toolbar -->
+        <header class="header" id="mainHeader">
+            <div class="header-left">
+                <button class="hamburger" id="hamburgerBtn" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="mobile-brand">
+                    <div class="mobile-logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                    <span>MU <strong>Library</strong></span>
+                </div>
+                <h2 id="pageTitle">
+                    <span id="currentLevelDisplay">Faculties</span>
+                    <small id="currentItemDisplay"></small>
+                </h2>
+            </div>
+            <div class="header-actions">
+                <div class="search-box desktop-search" id="headerSearchContainer">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Search faculties, programs, subjects..." autocomplete="off" />
+                    <button class="search-btn" onclick="triggerGlobalSearch()"><i class="fas fa-arrow-right"></i></button>
+                    <div id="searchSuggestions" class="search-suggestions"></div>
+                </div>
+                <div class="search-box mobile-search" id="mobileSearchContainer">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="mobileGlobalSearch" placeholder="Search..." autocomplete="off" />
+                    <div id="mobileSearchSuggestions" class="search-suggestions"></div>
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <span class="stats-badge" id="totalCount">0 items</span>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <section class="content-area" id="contentArea">
+            <div class="card-grid" id="cardGrid"></div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <h3>MU <span>Library</span></h3>
+                    <p>Empowering students across all faculties with free access to quality study materials.</p>
+                </div>
+                <div class="footer-links">
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 MU Library. Made with <i class="fas fa-heart"></i> for Mid-West University students.</p>
+            </div>
+        </footer>
+
+    </main>
+
+    <!-- Sidebar Overlay for mobile -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Resource Modal -->
+    <div id="resourceModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeResourceModal()">×</button>
+            <h3 id="modalTitle"></h3>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Back to top button -->
+    <button id="backToTop" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script src="script.js"></script>
+</body>
+</html>
