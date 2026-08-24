@@ -149,6 +149,15 @@
         display: block;
     }
 
+    /* NEW: Reset main content margin for mobile */
+    .main-content {
+        margin-left: 0;
+    }
+
+    .sidebar.collapsed+.main-content {
+        margin-left: 0;
+    }
+
     .hero {
         padding: 16px 16px 12px;
         text-align: center;

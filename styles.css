@@ -26,6 +26,10 @@
     --radius-card: 12px;
     --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* New variables for sidebar width */
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
 }
 
 [data-theme="dark"] {
@@ -56,13 +60,16 @@ body {
 /*  SIDEBAR                                                         */
 /* ================================================================ */
 .sidebar {
-    width: 260px;
+    width: var(--sidebar-width);
+    /* changed from 260px */
     background: var(--bg-sidebar);
     color: var(--text-dark);
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
-    position: sticky;
+    position: fixed;
+    /* changed from sticky */
+    left: 0;
     top: 0;
     height: 100vh;
     overflow-y: auto;
@@ -71,13 +78,13 @@ body {
         background 0.3s ease;
     z-index: 1000;
     border-right: 1px solid var(--border-color);
-    position: relative;
     overflow-x: hidden;
 }
 
 /* Collapsed state (desktop only) */
 .sidebar.collapsed {
-    width: 70px;
+    width: var(--sidebar-collapsed-width);
+    /* changed from 70px */
 }
 
 .sidebar.collapsed .sidebar-brand h1,
@@ -188,7 +195,6 @@ body {
     pointer-events: auto;
 }
 
-/* Keep same position when collapsed */
 .sidebar.collapsed .sidebar-collapse-btn {
     right: -5px;
     top: 50px;
@@ -296,6 +302,25 @@ body {
     font-size: 11px;
     color: var(--text-muted);
     text-align: center;
+}
+
+/* ================================================================ */
+/*  MAIN CONTENT (adjust for fixed sidebar)                         */
+/* ================================================================ */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: var(--bg-body);
+    transition: background 0.3s ease, margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: var(--sidebar-width);
+    /* NEW */
+}
+
+/* When sidebar is collapsed, reduce margin */
+.sidebar.collapsed+.main-content {
+    margin-left: var(--sidebar-collapsed-width);
 }
 
 /* ================================================================ */
@@ -444,8 +469,6 @@ body {
     max-width: 540px;
 }
 
-/* Removed .hero-stats block */
-
 /* ================================================================ */
 /*  HEADER                                                         */
 /* ================================================================ */
@@ -557,6 +580,21 @@ body {
 
 .search-box input::placeholder {
     color: var(--text-muted);
+}
+
+/* NEW: Clear button */
+.clear-btn {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    color: var(--text-muted);
+    padding: 0 4px;
+    transition: var(--transition);
+}
+
+.clear-btn:hover {
+    color: var(--text-dark);
 }
 
 .search-box .search-btn {
@@ -731,15 +769,6 @@ body {
 /* ================================================================ */
 /*  CONTENT AREA                                                   */
 /* ================================================================ */
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background: var(--bg-body);
-    transition: background 0.3s ease;
-}
-
 .content-area {
     flex: 1;
     padding: 20px 24px 24px;
@@ -760,6 +789,27 @@ body {
 /* ===== Back button (navigation) ===== */
 .back-nav {
     margin-bottom: 16px;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
+    background: var(--bg-input);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-muted);
+    transition: var(--transition);
+    font-family: 'Inter', sans-serif;
+}
+
+.back-btn:hover {
+    background: var(--bg-hover);
+    color: var(--accent-teal);
+    transform: translateX(-3px);
 }
 
 /* ================================================================ */
