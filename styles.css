@@ -1276,7 +1276,7 @@ body {
     padding: 24px;
     max-width: 600px;
     width: 90%;
-    max-height: 80vh;
+    height: 85vh;
     overflow-y: auto;
     position: relative;
     box-shadow: var(--shadow-xl);
