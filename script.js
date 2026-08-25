@@ -1,19 +1,4 @@
-// ================================================================
-//  📚  MU Library – Refactored JavaScript
-// ================================================================
-//  Improvements:
-//  - Hash-only routing: all navigation changes window.location.hash;
-//    the hashchange handler updates state and renders.
-//  - Event delegation: no inline onclick in generated HTML.
-//  - Lazy search index building.
-//  - Accessibility: modal dialog, listbox for suggestions, clear search.
-//  - Fixed sidebar with margin on main content.
-//  - Semester labels now show "Semester X" instead of "Item X".
-// ================================================================
 
-// ================================================================
-//  DATA (move to data.json in production)
-// ================================================================
 const DATA = {
   faculties: {
     be: {
@@ -1276,8 +1261,8 @@ function generateResourceContent(subject) {
   ];
 
   const pdfMap = {
-    CE411_notes: "resources/applied_mechanics-I_note.pdf",
-    SH421_syllabus: "resources/mathematics-II_syllabus.pdf",
+    CE411_notes: "applied_mechanics-I_note.pdf",
+    SH421_syllabus: "mathematics-II_syllabus.pdf",
   };
 
   const getPdfUrl = (type) => {
