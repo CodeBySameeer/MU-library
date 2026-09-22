@@ -1,4 +1,142 @@
+// ================================================================
+//  📚  MU Library – Modern Dynamic Edition
+// ================================================================
+//  Fixes applied:
+//  - Filters only show on subject (resources) page
+//  - Each resource has View + Download buttons
+//  - Download uses full subject name for the filename
+// ================================================================
 
+// ================================================================
+//  RESOURCES
+// ================================================================
+const RESOURCES = {
+  SH411: {
+    syllabus: [
+      {
+        title: "Official Syllabus — Engineering Mathematics I (2024)",
+        url: "pdfs/SH411-syllabus.pdf",
+      },
+    ],
+    notes: [
+      {
+        title: "Unit 1–2: Limits, Continuity & Derivatives",
+        url: "pdfs/SH411-notes-1.pdf",
+        author: "Prof. R. Sharma",
+      },
+      {
+        title: "Unit 3–4: Integration & Applications",
+        url: "pdfs/SH411-notes-2.pdf",
+        author: "Prof. R. Sharma",
+      },
+      {
+        title: "Unit 5: Vector Algebra",
+        url: "pdfs/SH411-notes-3.pdf",
+        author: "Ms. K. Thapa",
+      },
+    ],
+    pyq: [
+      {
+        title: "End Semester Exam",
+        url: "pdfs/SH411-pyq-2024.pdf",
+        year: 2024,
+      },
+      {
+        title: "End Semester Exam",
+        url: "pdfs/SH411-pyq-2023.pdf",
+        year: 2023,
+      },
+      {
+        title: "End Semester Exam",
+        url: "pdfs/SH411-pyq-2022.pdf",
+        year: 2022,
+      },
+    ],
+    assignments: [
+      {
+        title: "Assignment 1 — Limits & Continuity",
+        url: "pdfs/SH411-assign-1.pdf",
+      },
+      { title: "Assignment 2 — Derivatives", url: "pdfs/SH411-assign-2.pdf" },
+    ],
+  },
+
+  CE411: {
+    syllabus: [
+      { title: "Official Syllabus (2024)", url: "pdfs/CE411-syllabus.pdf" },
+    ],
+    notes: [
+      {
+        title: "Statics of Particles — Complete Notes",
+        url: "pdfs/CE411-notes-1.pdf",
+        author: "Dr. B. Adhikari",
+      },
+    ],
+    pyq: [
+      {
+        title: "End Semester Exam",
+        url: "pdfs/CE411-pyq-2024.pdf",
+        year: 2024,
+      },
+    ],
+    assignments: [],
+  },
+
+  SH412: {
+    syllabus: [
+      { title: "Official Syllabus (2024)", url: "pdfs/SH412-syllabus.pdf" },
+    ],
+    notes: [
+      { title: "Optics & Wave Mechanics", url: "pdfs/SH412-notes-1.pdf" },
+    ],
+    pyq: [],
+    assignments: [],
+  },
+
+  SH421: {
+    syllabus: [
+      { title: "Official Syllabus (2024)", url: "pdfs/SH421-syllabus.pdf" },
+    ],
+    notes: [
+      {
+        title: "Partial Derivatives & Multiple Integrals",
+        url: "pdfs/SH421-notes-1.pdf",
+      },
+    ],
+    pyq: [
+      {
+        title: "End Semester Exam",
+        url: "pdfs/SH421-pyq-2024.pdf",
+        year: 2024,
+      },
+    ],
+    assignments: [],
+  },
+
+  CT411: {
+    syllabus: [
+      { title: "Official Syllabus (2024)", url: "pdfs/CT411-syllabus.pdf" },
+    ],
+    notes: [
+      { title: "C Programming — Full Notes", url: "pdfs/CT411-notes-1.pdf" },
+      { title: "Pointers & Arrays Deep Dive", url: "pdfs/CT411-notes-2.pdf" },
+    ],
+    pyq: [
+      {
+        title: "End Semester Exam",
+        url: "pdfs/CT411-pyq-2024.pdf",
+        year: 2024,
+      },
+    ],
+    assignments: [
+      { title: "Assignment 1 — Basics", url: "pdfs/CT411-assign-1.pdf" },
+    ],
+  },
+};
+
+// ================================================================
+//  DATA
+// ================================================================
 const DATA = {
   faculties: {
     be: {
@@ -406,401 +544,778 @@ const DATA = {
 };
 
 // ================================================================
-//  APP STATE
+//  STATE
 // ================================================================
 const state = {
   level: "faculties",
-  path: {
-    faculty: null,
-    program: null,
-    semester: null,
-    subject: null,
-  },
+  path: { faculty: null, program: null, semester: null, subject: null },
+  theme:
+    localStorage.getItem("muTheme") ||
+    (window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light"),
+  accent: localStorage.getItem("muAccent") || "teal",
+  favorites: JSON.parse(localStorage.getItem("muFavorites") || "[]"),
+  recent: [],
+  currentFilter: "all",
+};
+
+const RECENT_TTL = 30 * 60 * 1000;
+let recentTimer = null;
+
+const ACCENTS = {
+  teal: { color: "#2d9cdb", hover: "#1a7aad", soft: "rgba(45,156,219,0.1)" },
+  purple: { color: "#6c5ce7", hover: "#5a4fcf", soft: "rgba(108,92,231,0.1)" },
+  pink: { color: "#ec4899", hover: "#db2777", soft: "rgba(236,72,153,0.1)" },
+  emerald: { color: "#10b981", hover: "#059669", soft: "rgba(16,185,129,0.1)" },
+  amber: { color: "#f59e0b", hover: "#d97706", soft: "rgba(245,158,11,0.1)" },
+  rose: { color: "#f43f5e", hover: "#e11d48", soft: "rgba(244,63,94,0.1)" },
 };
 
 // ================================================================
-//  DOM REFERENCES
+//  DOM HELPERS
 // ================================================================
-const elements = {
-  navList: document.getElementById("navList"),
-  navLabelText: document.getElementById("navLabelText"),
-  cardGrid: document.getElementById("cardGrid"),
-  breadcrumb: document.getElementById("breadcrumb"),
-  heroTitle: document.getElementById("heroTitle"),
-  heroSubtext: document.getElementById("heroSubtext"),
-  currentLevelDisplay: document.getElementById("currentLevelDisplay"),
-  currentItemDisplay: document.getElementById("currentItemDisplay"),
-  subtitleDisplay: document.getElementById("subtitleDisplay"),
-  footerStats: document.getElementById("footerStats"),
-  totalCount: document.getElementById("totalCount"),
-  sidebar: document.getElementById("sidebar"),
-  sidebarToggle: document.getElementById("sidebarToggle"),
-  overlay: document.getElementById("sidebarOverlay"),
-  hamburger: document.getElementById("hamburgerBtn"),
-  sidebarCloseBtn: document.getElementById("sidebarCloseBtn"),
-  searchInput: document.getElementById("globalSearchInput"),
-  mobileSearchInput: document.getElementById("mobileGlobalSearch"),
-  suggestionsBox: document.getElementById("searchSuggestions"),
-  mobileSuggestionsBox: document.getElementById("mobileSearchSuggestions"),
-  clearSearchBtn: document.getElementById("clearSearchBtn"),
-  mobileClearSearchBtn: document.getElementById("mobileClearSearchBtn"),
-  modal: document.getElementById("resourceModal"),
-  modalTitle: document.getElementById("modalTitle"),
-  modalBody: document.getElementById("modalBody"),
-  backToTopBtn: document.getElementById("backToTop"),
-  themeToggle: document.getElementById("themeToggle"),
-  themeIcon: themeToggle.querySelector("i"),
+const $ = (s) => document.querySelector(s);
+
+const E = {
+  navList: $("#navList"),
+  navLabelText: $("#navLabelText"),
+  cardGrid: $("#cardGrid"),
+  breadcrumb: $("#breadcrumb"),
+  heroTitle: $("#heroTitle"),
+  heroSubtext: $("#heroSubtext"),
+  currentLevelDisplay: $("#currentLevelDisplay"),
+  currentItemDisplay: $("#currentItemDisplay"),
+  subtitleDisplay: $("#subtitleDisplay"),
+  footerStats: $("#footerStats"),
+  totalCount: $("#totalCount"),
+  sidebar: $("#sidebar"),
+  sidebarToggle: $("#sidebarToggle"),
+  overlay: $("#sidebarOverlay"),
+  hamburger: $("#hamburgerBtn"),
+  sidebarCloseBtn: $("#sidebarCloseBtn"),
+  searchInput: $("#globalSearchInput"),
+  mobileSearchInput: $("#mobileGlobalSearch"),
+  suggestionsBox: $("#searchSuggestions"),
+  mobileSuggestionsBox: $("#mobileSearchSuggestions"),
+  clearSearchBtn: $("#clearSearchBtn"),
+  mobileClearSearchBtn: $("#mobileClearSearchBtn"),
+  searchBtn: $("#searchBtn"),
+  modal: $("#resourceModal"),
+  modalTitle: $("#modalTitle"),
+  modalBody: $("#modalBody"),
+  modalClose: $("#resourceModal .modal-close"),
+  backToTopBtn: $("#backToTop"),
+  themeToggle: $("#themeToggle"),
+  themeIcon: $("#themeToggle i"),
+  contentArea: $("#contentArea"),
+  toastContainer: $("#toastContainer"),
+  scrollProgress: $("#scrollProgress"),
+  accentToggle: $("#accentToggle"),
+  accentMenu: $("#accentMenu"),
+  commandPalette: $("#commandPalette"),
+  commandInput: $("#commandInput"),
+  commandResults: $("#commandResults"),
+  openCommandPalette: $("#openCommandPalette"),
+  favoritesStrip: $("#favoritesStrip"),
+  favoritesStripBody: $("#favoritesStripBody"),
+  recentStrip: $("#recentStrip"),
+  recentStripBody: $("#recentStripBody"),
+  favCount: $("#favCount"),
+  recentCount: $("#recentCount"),
+  sidebarQuick: $("#sidebarQuick"),
+  filters: $("#filters"),
 };
 
 // ================================================================
-//  SEARCH ENGINE (lazy index)
+//  UTILITIES
+// ================================================================
+function escapeHtml(str) {
+  return String(str).replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[
+        c
+      ])
+  );
+}
+
+function highlight(text, q) {
+  if (!q) return escapeHtml(text);
+  const safe = escapeHtml(text);
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  return safe.replace(re, "<mark>$1</mark>");
+}
+
+function debounce(fn, delay) {
+  let t;
+  return function (...args) {
+    clearTimeout(t);
+    t = setTimeout(() => fn.apply(this, args), delay);
+  };
+}
+
+function persistFavorites() {
+  localStorage.setItem("muFavorites", JSON.stringify(state.favorites));
+}
+
+// ================================================================
+//  TOAST
+// ================================================================
+function showToast(message, type = "info", icon = null) {
+  const icons = {
+    success: "fa-check-circle",
+    error: "fa-times-circle",
+    info: "fa-info-circle",
+  };
+  const el = document.createElement("div");
+  el.className = `toast ${type}`;
+  el.innerHTML = `<i class="fas ${
+    icon || icons[type] || icons.info
+  }"></i><span>${escapeHtml(message)}</span>`;
+  E.toastContainer.appendChild(el);
+  setTimeout(() => {
+    el.classList.add("removing");
+    setTimeout(() => el.remove(), 300);
+  }, 3000);
+}
+
+// ================================================================
+//  FAVORITES
+// ================================================================
+function isFavorite(code) {
+  return state.favorites.includes(code);
+}
+
+function toggleFavorite(code, name) {
+  const idx = state.favorites.indexOf(code);
+  if (idx >= 0) {
+    state.favorites.splice(idx, 1);
+    showToast(`Removed "${name}" from favorites`, "info", "fa-star");
+  } else {
+    state.favorites.push(code);
+    showToast(`Added "${name}" to favorites`, "success", "fa-star");
+  }
+  persistFavorites();
+  updateQuickCounts();
+  renderContent();
+  updateStrips();
+}
+
+function removeFavorite(code) {
+  const idx = state.favorites.indexOf(code);
+  if (idx < 0) return;
+  const found = findSubjectByCode(code);
+  const name = found ? found.subject.name : code;
+  state.favorites.splice(idx, 1);
+  persistFavorites();
+  updateQuickCounts();
+  renderContent();
+  updateStrips();
+  showToast(`Removed "${name}" from favorites`, "info", "fa-star");
+}
+
+function clearFavorites() {
+  if (state.favorites.length === 0) {
+    showToast("No favorites to clear", "info", "fa-star");
+    return;
+  }
+  const count = state.favorites.length;
+  state.favorites = [];
+  persistFavorites();
+  updateQuickCounts();
+  renderContent();
+  updateStrips();
+  showToast(
+    `Cleared ${count} favorite${count > 1 ? "s" : ""}`,
+    "info",
+    "fa-trash-can"
+  );
+}
+
+// ================================================================
+//  RECENTLY VIEWED
+// ================================================================
+function addRecent(subject) {
+  state.recent = [
+    subject,
+    ...state.recent.filter((s) => s.code !== subject.code),
+  ].slice(0, 8);
+  updateQuickCounts();
+  updateStrips();
+
+  if (recentTimer) clearTimeout(recentTimer);
+  recentTimer = setTimeout(() => {
+    if (state.recent.length === 0) return;
+    state.recent = [];
+    updateQuickCounts();
+    updateStrips();
+    showToast(
+      "Recently viewed expired (30 min)",
+      "info",
+      "fa-clock-rotate-left"
+    );
+    recentTimer = null;
+  }, RECENT_TTL);
+}
+
+function clearRecent() {
+  if (state.recent.length === 0) {
+    showToast("No recent items to clear", "info", "fa-clock-rotate-left");
+    return;
+  }
+  state.recent = [];
+  if (recentTimer) {
+    clearTimeout(recentTimer);
+    recentTimer = null;
+  }
+  updateQuickCounts();
+  updateStrips();
+  showToast("Recently viewed cleared", "info", "fa-trash-can");
+}
+
+// ================================================================
+//  HELPERS
+// ================================================================
+function findSubjectByCode(code) {
+  for (const facKey in DATA.faculties) {
+    const fac = DATA.faculties[facKey];
+    for (const progKey in fac.programs) {
+      const prog = fac.programs[progKey];
+      for (const sem of prog.semesters) {
+        const sub = sem.subjects.find((s) => s.code === code);
+        if (sub)
+          return {
+            subject: sub,
+            faculty: facKey,
+            program: progKey,
+            semester: sem.semester,
+          };
+      }
+    }
+  }
+  return null;
+}
+
+function updateQuickCounts() {
+  if (E.favCount) E.favCount.textContent = state.favorites.length;
+  if (E.recentCount) E.recentCount.textContent = state.recent.length;
+}
+
+function updateStrips() {
+  if (state.favorites.length > 0) {
+    E.favoritesStrip.hidden = false;
+    E.favoritesStripBody.innerHTML = state.favorites
+      .map((code) => {
+        const found = findSubjectByCode(code);
+        const name = found ? found.subject.name : code;
+        return `<div class="strip-chip has-remove" data-code="${escapeHtml(
+          code
+        )}" role="button" tabindex="0">
+          <i class="fas fa-star"></i>
+          <span class="chip-name">${escapeHtml(name)}</span>
+          <span class="chip-code">${escapeHtml(code)}</span>
+          <button class="chip-remove" data-remove="${escapeHtml(
+            code
+          )}" aria-label="Remove from favorites" title="Remove">
+              <i class="fas fa-times"></i>
+          </button>
+      </div>`;
+      })
+      .join("");
+  } else {
+    E.favoritesStrip.hidden = true;
+    E.favoritesStripBody.innerHTML = "";
+  }
+
+  if (state.recent.length > 0) {
+    E.recentStrip.hidden = false;
+    E.recentStripBody.innerHTML = state.recent
+      .map(
+        (sub) =>
+          `<div class="strip-chip" data-code="${escapeHtml(
+            sub.code
+          )}" role="button" tabindex="0">
+          <i class="fas fa-clock-rotate-left"></i>
+          <span class="chip-name">${escapeHtml(sub.name)}</span>
+          <span class="chip-code">${escapeHtml(sub.code)}</span>
+      </div>`
+      )
+      .join("");
+  } else {
+    E.recentStrip.hidden = true;
+    E.recentStripBody.innerHTML = "";
+  }
+}
+
+// ================================================================
+//  SEARCH ENGINE
 // ================================================================
 let searchIndex = null;
 
 function buildSearchIndex() {
-  const index = [];
-  Object.entries(DATA.faculties).forEach(([facKey, fac]) => {
-    index.push({
+  const idx = [];
+  Object.entries(DATA.faculties).forEach(([fk, f]) => {
+    idx.push({
       type: "faculty",
-      key: facKey,
-      name: fac.name,
-      icon: fac.icon,
+      key: fk,
+      name: f.name,
+      icon: f.icon,
       path: [],
       meta: "Faculty",
     });
-    Object.entries(fac.programs).forEach(([progKey, prog]) => {
-      index.push({
+    Object.entries(f.programs).forEach(([pk, p]) => {
+      idx.push({
         type: "program",
-        key: progKey,
-        name: prog.name,
-        icon: prog.icon,
-        path: [facKey],
-        meta: `Program · ${fac.name}`,
+        key: pk,
+        name: p.name,
+        icon: p.icon,
+        path: [fk],
+        meta: `Program · ${f.name}`,
       });
-      prog.semesters.forEach((sem) => {
+      p.semesters.forEach((sem) => {
         sem.subjects.forEach((sub) => {
-          index.push({
+          idx.push({
             type: "subject",
             key: sub.code,
             name: sub.name,
             code: sub.code,
             icon: "fa-book",
-            path: [facKey, progKey, sem.semester],
-            meta: `Subject · Sem ${sem.semester} · ${prog.name}`,
+            path: [fk, pk, sem.semester],
+            meta: `Subject · Sem ${sem.semester} · ${p.name}`,
             semester: sem.semester,
-            faculty: facKey,
-            program: progKey,
+            faculty: fk,
+            program: pk,
           });
         });
       });
     });
   });
-  return index;
+  return idx;
 }
 
 function getSearchIndex() {
-  if (!searchIndex) {
-    searchIndex = buildSearchIndex();
-  }
+  if (!searchIndex) searchIndex = buildSearchIndex();
   return searchIndex;
 }
 
-function performGlobalSearch(query) {
-  if (!query || query.trim().length < 1) return [];
+function performSearch(query) {
+  if (!query?.trim()) return [];
   const q = query.trim().toLowerCase();
   return getSearchIndex()
-    .filter((item) => {
-      const nameMatch = item.name.toLowerCase().includes(q);
-      const codeMatch = item.code && item.code.toLowerCase().includes(q);
-      const metaMatch = item.meta && item.meta.toLowerCase().includes(q);
-      return nameMatch || codeMatch || metaMatch;
-    })
-    .slice(0, 10);
+    .filter(
+      (i) =>
+        i.name.toLowerCase().includes(q) ||
+        (i.code && i.code.toLowerCase().includes(q)) ||
+        (i.meta && i.meta.toLowerCase().includes(q))
+    )
+    .slice(0, 12);
 }
 
 // ================================================================
 //  SEARCH UI
 // ================================================================
-let highlightedSuggestionIndex = -1;
+let highlightedIndex = -1;
 let currentSuggestionItems = [];
 
-function showSuggestions(results, targetBox) {
-  targetBox.innerHTML = "";
+function showSuggestions(results, box, query = "") {
+  box.innerHTML = "";
+  highlightedIndex = -1;
+  currentSuggestionItems = [];
+
   if (results.length === 0) {
-    targetBox.innerHTML = `<div class="no-results">No results found</div>`;
-    targetBox.classList.add("active");
-    currentSuggestionItems = [];
+    box.innerHTML = `<div class="no-results">No results found</div>`;
+    box.classList.add("active");
     return;
   }
 
-  let html = "";
-  results.forEach((item, idx) => {
-    const icon = item.icon || "fa-folder";
-    let metaHtml = `<span class="tag">${item.type}</span>`;
-    if (item.type === "subject") {
-      metaHtml += `<span><i class="fas fa-code"></i> ${item.code}</span>`;
-      metaHtml += `<span><i class="fas fa-layer-group"></i> Sem ${item.semester}</span>`;
-    }
-    if (item.meta && item.type !== "subject") {
-      metaHtml += `<span>${item.meta}</span>`;
-    }
-
-    html += `
-      <div class="search-suggestion-item" 
-           role="option"
-           id="suggestion-${idx}"
-           data-type="${item.type}" 
-           data-key="${item.key}" 
-           data-path="${JSON.stringify(item.path).replace(/"/g, "&quot;")}">
+  box.innerHTML = results
+    .map((item, i) => {
+      const icon = item.icon || "fa-folder";
+      let meta = `<span class="tag">${item.type}</span>`;
+      if (item.type === "subject") {
+        meta += `<span><i class="fas fa-code"></i> ${escapeHtml(
+          item.code
+        )}</span>`;
+        meta += `<span><i class="fas fa-layer-group"></i> Sem ${item.semester}</span>`;
+      } else if (item.meta) {
+        meta += `<span>${escapeHtml(item.meta)}</span>`;
+      }
+      const path = JSON.stringify(item.path).replace(/"/g, "&quot;");
+      return `<div class="search-suggestion-item" role="option" id="sug-${i}"
+                data-type="${escapeHtml(item.type)}"
+                data-key="${escapeHtml(item.key)}"
+                data-path="${path}"
+                aria-selected="false">
         <div class="suggestion-icon"><i class="fas ${icon}"></i></div>
         <div class="suggestion-info">
-          <div class="suggestion-name">${item.name}</div>
-          <div class="suggestion-meta">${metaHtml}</div>
+            <div class="suggestion-name">${highlight(item.name, query)}</div>
+            <div class="suggestion-meta">${meta}</div>
         </div>
-      </div>
-    `;
-  });
-  targetBox.innerHTML = html;
-  targetBox.setAttribute("role", "listbox");
-  targetBox.classList.add("active");
-  currentSuggestionItems = targetBox.querySelectorAll(
-    ".search-suggestion-item"
-  );
-  highlightedSuggestionIndex = -1;
+    </div>`;
+    })
+    .join("");
+
+  box.classList.add("active");
+  currentSuggestionItems = box.querySelectorAll(".search-suggestion-item");
 }
 
 function hideSuggestions() {
-  elements.suggestionsBox.classList.remove("active");
-  elements.mobileSuggestionsBox.classList.remove("active");
-  elements.suggestionsBox.removeAttribute("role");
-  elements.mobileSuggestionsBox.removeAttribute("role");
+  E.suggestionsBox.classList.remove("active");
+  E.mobileSuggestionsBox.classList.remove("active");
   currentSuggestionItems = [];
+  highlightedIndex = -1;
 }
 
-function handleSuggestionClick(item) {
-  const { type, key, path } = item.dataset;
+function handleSuggestionClick(el) {
+  if (!el) return;
+  const { type, key, path } = el.dataset;
   let pathArr = [];
   try {
     pathArr = JSON.parse(path);
-  } catch (e) {
+  } catch {
     pathArr = [];
   }
 
   hideSuggestions();
-  elements.searchInput.value = "";
-  elements.mobileSearchInput.value = "";
+  E.searchInput.value = "";
+  E.mobileSearchInput.value = "";
 
-  let newHash = "";
-  if (type === "faculty") {
-    newHash = `/${key}`;
-  } else if (type === "program") {
-    newHash = `/${pathArr[0]}/${key}`;
-  } else if (type === "subject") {
-    newHash = `/${pathArr[0]}/${pathArr[1]}/${pathArr[2]}/${key}`;
-  }
-  if (newHash) {
-    window.location.hash = newHash;
-  }
+  let hash = "";
+  if (type === "faculty") hash = `/${key}`;
+  else if (type === "program") hash = `/${pathArr[0]}/${key}`;
+  else if (type === "subject")
+    hash = `/${pathArr[0]}/${pathArr[1]}/${pathArr[2]}/${key}`;
+  if (hash) window.location.hash = hash;
 }
 
-// Event delegation for suggestion clicks
-elements.suggestionsBox.addEventListener("click", (e) => {
-  const item = e.target.closest(".search-suggestion-item");
-  if (item) handleSuggestionClick(item);
+const handleSearchInput = debounce((value, box, clearBtn) => {
+  const trimmed = value.trim();
+  if (clearBtn) clearBtn.hidden = !trimmed;
+  if (trimmed) showSuggestions(performSearch(trimmed), box, trimmed);
+  else hideSuggestions();
+}, 220);
+
+E.searchInput.addEventListener("input", (e) => {
+  E.mobileSearchInput.value = e.target.value;
+  E.mobileClearSearchBtn.hidden = !e.target.value.trim();
+  handleSearchInput(e.target.value, E.suggestionsBox, E.clearSearchBtn);
 });
 
-elements.mobileSuggestionsBox.addEventListener("click", (e) => {
-  const item = e.target.closest(".search-suggestion-item");
-  if (item) handleSuggestionClick(item);
+E.mobileSearchInput.addEventListener("input", (e) => {
+  E.searchInput.value = e.target.value;
+  E.clearSearchBtn.hidden = !e.target.value.trim();
+  handleSearchInput(
+    e.target.value,
+    E.mobileSuggestionsBox,
+    E.mobileClearSearchBtn
+  );
 });
 
-// Search input handlers
-function debounce(fn, delay) {
-  let timer;
-  return function (...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), delay);
-  };
-}
+E.searchInput.addEventListener("focus", () => {
+  if (!E.searchInput.value.trim()) hideSuggestions();
+});
+E.mobileSearchInput.addEventListener("focus", () => {
+  if (!E.mobileSearchInput.value.trim()) hideSuggestions();
+});
 
-const handleSearchInput = debounce((value) => {
-  const results = performGlobalSearch(value);
-  if (value.trim().length > 0) {
-    const target =
-      window.innerWidth <= 768
-        ? elements.mobileSuggestionsBox
-        : elements.suggestionsBox;
-    showSuggestions(results, target);
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-box")) hideSuggestions();
+});
+
+[E.suggestionsBox, E.mobileSuggestionsBox].forEach((box) => {
+  box.addEventListener("click", (e) => {
+    const item = e.target.closest(".search-suggestion-item");
+    if (item) handleSuggestionClick(item);
+  });
+});
+
+E.clearSearchBtn.addEventListener("click", () => {
+  E.searchInput.value = "";
+  E.mobileSearchInput.value = "";
+  E.clearSearchBtn.hidden = true;
+  E.mobileClearSearchBtn.hidden = true;
+  hideSuggestions();
+  E.searchInput.focus();
+});
+
+E.mobileClearSearchBtn.addEventListener("click", () => {
+  E.searchInput.value = "";
+  E.mobileSearchInput.value = "";
+  E.clearSearchBtn.hidden = true;
+  E.mobileClearSearchBtn.hidden = true;
+  hideSuggestions();
+  E.mobileSearchInput.focus();
+});
+
+E.searchBtn?.addEventListener("click", () => {
+  const q = E.searchInput.value.trim();
+  if (!q) return;
+  const results = performSearch(q);
+  if (results.length === 1) {
+    const item = results[0];
+    if (item.type === "faculty") window.location.hash = `/${item.key}`;
+    else if (item.type === "program")
+      window.location.hash = `/${item.path[0]}/${item.key}`;
+    else if (item.type === "subject")
+      window.location.hash = `/${item.path[0]}/${item.path[1]}/${item.path[2]}/${item.key}`;
   } else {
-    hideSuggestions();
+    showSuggestions(results, E.suggestionsBox, q);
   }
-}, 300);
-
-elements.searchInput.addEventListener("input", (e) => {
-  elements.mobileSearchInput.value = e.target.value;
-  handleSearchInput(e.target.value);
 });
 
-elements.mobileSearchInput.addEventListener("input", (e) => {
-  elements.searchInput.value = e.target.value;
-  handleSearchInput(e.target.value);
-});
-
-elements.searchInput.addEventListener("blur", () =>
-  setTimeout(() => elements.suggestionsBox.classList.remove("active"), 300)
-);
-elements.mobileSearchInput.addEventListener("blur", () =>
-  setTimeout(
-    () => elements.mobileSuggestionsBox.classList.remove("active"),
-    300
-  )
-);
-
-// Clear buttons
-elements.clearSearchBtn.addEventListener("click", () => {
-  elements.searchInput.value = "";
-  elements.mobileSearchInput.value = "";
-  hideSuggestions();
-  elements.searchInput.focus();
-});
-elements.mobileClearSearchBtn.addEventListener("click", () => {
-  elements.searchInput.value = "";
-  elements.mobileSearchInput.value = "";
-  hideSuggestions();
-  elements.mobileSearchInput.focus();
-});
-
-// Keyboard navigation in search
 document.addEventListener("keydown", (e) => {
-  const isDesktopSearchFocused =
-    document.activeElement === elements.searchInput;
-  const isMobileSearchFocused =
-    document.activeElement === elements.mobileSearchInput;
-  if (!isDesktopSearchFocused && !isMobileSearchFocused) return;
-
-  const items = currentSuggestionItems;
-  if (items.length === 0) return;
+  const active = document.activeElement;
+  const isSearchFocused =
+    active === E.searchInput || active === E.mobileSearchInput;
+  if (!isSearchFocused || currentSuggestionItems.length === 0) return;
 
   if (e.key === "ArrowDown") {
     e.preventDefault();
-    highlightedSuggestionIndex =
-      (highlightedSuggestionIndex + 1) % items.length;
-    highlightSuggestion(highlightedSuggestionIndex);
+    highlightedIndex = (highlightedIndex + 1) % currentSuggestionItems.length;
+    currentSuggestionItems.forEach((el, i) =>
+      el.setAttribute("aria-selected", i === highlightedIndex)
+    );
+    currentSuggestionItems[highlightedIndex].scrollIntoView({
+      block: "nearest",
+    });
   } else if (e.key === "ArrowUp") {
     e.preventDefault();
-    highlightedSuggestionIndex =
-      (highlightedSuggestionIndex - 1 + items.length) % items.length;
-    highlightSuggestion(highlightedSuggestionIndex);
-  } else if (e.key === "Enter") {
+    highlightedIndex =
+      (highlightedIndex - 1 + currentSuggestionItems.length) %
+      currentSuggestionItems.length;
+    currentSuggestionItems.forEach((el, i) =>
+      el.setAttribute("aria-selected", i === highlightedIndex)
+    );
+    currentSuggestionItems[highlightedIndex].scrollIntoView({
+      block: "nearest",
+    });
+  } else if (e.key === "Enter" && highlightedIndex >= 0) {
     e.preventDefault();
-    if (highlightedSuggestionIndex >= 0) {
-      items[highlightedSuggestionIndex].click();
-    } else {
-      const inputVal = isDesktopSearchFocused
-        ? elements.searchInput.value.trim()
-        : elements.mobileSearchInput.value.trim();
-      const results = performGlobalSearch(inputVal);
-      if (results.length === 1) {
-        handleSuggestionClick({
-          dataset: {
-            type: results[0].type,
-            key: results[0].key,
-            path: JSON.stringify(results[0].path),
-          },
-        });
-      } else if (results.length > 1) {
-        const target =
-          window.innerWidth <= 768
-            ? elements.mobileSuggestionsBox
-            : elements.suggestionsBox;
-        showSuggestions(results, target);
-      }
-    }
+    currentSuggestionItems[highlightedIndex].click();
   }
 });
 
-function highlightSuggestion(index) {
-  currentSuggestionItems.forEach((item, i) => {
-    item.style.background = i === index ? "var(--bg-hover)" : "";
-    item.setAttribute("aria-selected", i === index ? "true" : "false");
-  });
-  const input =
-    window.innerWidth <= 768
-      ? elements.mobileSearchInput
-      : elements.searchInput;
-  input.setAttribute("aria-activedescendant", `suggestion-${index}`);
+// ================================================================
+//  COMMAND PALETTE
+// ================================================================
+let commandItems = [];
+let commandHighlight = -1;
+
+function openCommand() {
+  E.commandPalette.hidden = false;
+  document.body.style.overflow = "hidden";
+  E.commandInput.value = "";
+  E.commandInput.focus();
+  renderCommandResults("");
 }
 
-// Recent searches
-let recentSearches = JSON.parse(
-  localStorage.getItem("muRecentSearches") || "[]"
+function closeCommand() {
+  E.commandPalette.hidden = true;
+  document.body.style.overflow = "";
+  commandHighlight = -1;
+}
+
+function getCommandActions() {
+  return [
+    {
+      name: "Toggle Theme",
+      icon: "fa-moon",
+      shortcut: "Ctrl+J",
+      action: () => {
+        applyTheme(state.theme === "dark" ? "light" : "dark");
+        closeCommand();
+      },
+    },
+    {
+      name: "Toggle Sidebar",
+      icon: "fa-bars",
+      shortcut: "Ctrl+B",
+      action: () => {
+        if (window.innerWidth > 768) E.sidebar.classList.toggle("collapsed");
+        else toggleSidebar();
+        closeCommand();
+      },
+    },
+    {
+      name: "Go to Home",
+      icon: "fa-house",
+      shortcut: "",
+      action: () => {
+        window.location.hash = "";
+        closeCommand();
+      },
+    },
+    {
+      name: "Clear Favorites",
+      icon: "fa-star",
+      shortcut: "",
+      action: () => {
+        clearFavorites();
+        closeCommand();
+      },
+    },
+    {
+      name: "Clear Recently Viewed",
+      icon: "fa-clock-rotate-left",
+      shortcut: "",
+      action: () => {
+        clearRecent();
+        closeCommand();
+      },
+    },
+  ];
+}
+
+function renderCommandResults(query) {
+  const allActions = getCommandActions();
+  const q = query.trim().toLowerCase();
+  const filteredActions = q
+    ? allActions.filter((a) => a.name.toLowerCase().includes(q))
+    : allActions;
+  const results = q ? performSearch(query) : getSearchIndex().slice(0, 8);
+
+  let html = "";
+
+  if (filteredActions.length) {
+    html += `<div style="padding: 6px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Actions</div>`;
+    html += filteredActions
+      .map(
+        (a, i) => `
+      <div class="command-item" data-cmd-type="action" data-cmd-index="${i}" aria-selected="false">
+          <div class="cmd-icon"><i class="fas ${a.icon}"></i></div>
+          <div class="cmd-info"><div class="cmd-name">${escapeHtml(
+            a.name
+          )}</div></div>
+          ${a.shortcut ? `<span class="cmd-shortcut">${a.shortcut}</span>` : ""}
+      </div>`
+      )
+      .join("");
+  }
+
+  if (results.length) {
+    html += `<div style="padding: 6px 12px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px;">Results</div>`;
+    html += results
+      .map((item, i) => {
+        const icon = item.icon || "fa-folder";
+        let meta = `<span class="tag">${item.type}</span>`;
+        if (item.type === "subject")
+          meta += `<span>Sem ${item.semester}</span>`;
+        return `<div class="command-item" data-cmd-type="search" data-cmd-index="${i}" aria-selected="false">
+          <div class="cmd-icon"><i class="fas ${icon}"></i></div>
+          <div class="cmd-info">
+              <div class="cmd-name">${highlight(item.name, query)}</div>
+              <div class="cmd-meta">${meta}</div>
+          </div>
+      </div>`;
+      })
+      .join("");
+  }
+
+  if (!html)
+    html = `<div class="command-empty"><i class="fas fa-search"></i>No results</div>`;
+
+  E.commandResults.innerHTML = html;
+  commandItems = E.commandResults.querySelectorAll(".command-item");
+  commandHighlight = -1;
+
+  commandItems.forEach((el) => {
+    el.addEventListener("click", () => executeCommandItem(el));
+    el.addEventListener("mouseenter", () => {
+      commandItems.forEach((x) => x.setAttribute("aria-selected", "false"));
+      el.setAttribute("aria-selected", "true");
+      commandHighlight = parseInt(el.dataset.cmdIndex);
+    });
+  });
+}
+
+function executeCommandItem(el) {
+  const type = el.dataset.cmdType;
+  const idx = parseInt(el.dataset.cmdIndex);
+  const query = E.commandInput.value.trim();
+
+  if (type === "action") {
+    const allActions = getCommandActions();
+    const filtered = query
+      ? allActions.filter((a) =>
+          a.name.toLowerCase().includes(query.toLowerCase())
+        )
+      : allActions;
+    filtered[idx]?.action?.();
+  } else {
+    const results = query ? performSearch(query) : getSearchIndex().slice(0, 8);
+    const item = results[idx];
+    if (item) {
+      let hash = "";
+      if (item.type === "faculty") hash = `/${item.key}`;
+      else if (item.type === "program") hash = `/${item.path[0]}/${item.key}`;
+      else if (item.type === "subject")
+        hash = `/${item.path[0]}/${item.path[1]}/${item.path[2]}/${item.key}`;
+      if (hash) window.location.hash = hash;
+      closeCommand();
+    }
+  }
+}
+
+E.openCommandPalette?.addEventListener("click", openCommand);
+E.commandPalette?.addEventListener("click", (e) => {
+  if (e.target === E.commandPalette) closeCommand();
+});
+E.commandInput?.addEventListener("input", (e) =>
+  renderCommandResults(e.target.value)
 );
 
-function saveRecentSearch(query) {
-  recentSearches = [query, ...recentSearches.filter((q) => q !== query)].slice(
-    0,
-    5
-  );
-  localStorage.setItem("muRecentSearches", JSON.stringify(recentSearches));
-}
-
-function showRecentSearches(targetBox) {
-  if (recentSearches.length === 0) return;
-  targetBox.innerHTML = recentSearches
-    .map(
-      (q) => `
-    <div class="search-suggestion-item" role="option" data-recent="${q}">
-      <div class="suggestion-icon"><i class="fas fa-history"></i></div>
-      <div class="suggestion-info">
-        <div class="suggestion-name">${q}</div>
-        <div class="suggestion-meta"><span class="tag">Recent</span></div>
-      </div>
-    </div>
-  `
-    )
-    .join("");
-  targetBox.classList.add("active");
-  targetBox.setAttribute("role", "listbox");
-  currentSuggestionItems = targetBox.querySelectorAll(
-    ".search-suggestion-item"
-  );
-  highlightedSuggestionIndex = -1;
-}
-
-elements.searchInput.addEventListener("focus", () => {
-  if (!elements.searchInput.value.trim())
-    showRecentSearches(elements.suggestionsBox);
+E.commandInput?.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    commandHighlight =
+      (commandHighlight + 1) % Math.max(commandItems.length, 1);
+    updateCommandHighlight();
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    commandHighlight =
+      (commandHighlight - 1 + commandItems.length) %
+      Math.max(commandItems.length, 1);
+    updateCommandHighlight();
+  } else if (e.key === "Enter") {
+    e.preventDefault();
+    if (commandHighlight >= 0 && commandItems[commandHighlight])
+      commandItems[commandHighlight].click();
+  } else if (e.key === "Escape") {
+    closeCommand();
+  }
 });
-elements.mobileSearchInput.addEventListener("focus", () => {
-  if (!elements.mobileSearchInput.value.trim())
-    showRecentSearches(elements.mobileSuggestionsBox);
-});
+
+function updateCommandHighlight() {
+  commandItems.forEach((el, i) =>
+    el.setAttribute("aria-selected", i === commandHighlight ? "true" : "false")
+  );
+  commandItems[commandHighlight]?.scrollIntoView({ block: "nearest" });
+}
 
 // ================================================================
-//  NAVIGATION & ROUTING (Hash-only)
+//  ROUTER
 // ================================================================
 function parseHash() {
-  const parts = window.location.hash
-    .replace("#", "")
-    .split("/")
-    .filter(Boolean);
+  const parts = location.hash.replace("#", "").split("/").filter(Boolean);
   const path = { faculty: null, program: null, semester: null, subject: null };
   let level = "faculties";
 
-  if (parts.length >= 1 && DATA.faculties[parts[0]]) {
+  if (parts[0] && DATA.faculties[parts[0]]) {
     path.faculty = parts[0];
     level = "programs";
-    if (parts.length >= 2 && DATA.faculties[parts[0]].programs[parts[1]]) {
+    if (parts[1] && DATA.faculties[parts[0]].programs[parts[1]]) {
       path.program = parts[1];
       level = "semesters";
-      if (parts.length >= 3) {
+      if (parts[2]) {
         const semNum = parseInt(parts[2]);
-        const prog = DATA.faculties[parts[0]].programs[parts[1]];
-        const sem = prog.semesters.find((s) => s.semester === semNum);
+        const sem = DATA.faculties[parts[0]].programs[parts[1]].semesters.find(
+          (s) => s.semester === semNum
+        );
         if (sem) {
           path.semester = semNum;
           level = "subjects";
-          if (parts.length >= 4) {
+          if (parts[3]) {
             const sub = sem.subjects.find((s) => s.code === parts[3]);
             if (sub) {
               path.subject = sub;
@@ -811,7 +1326,6 @@ function parseHash() {
       }
     }
   }
-
   return { path, level };
 }
 
@@ -819,192 +1333,178 @@ function handleHash() {
   const { path, level } = parseHash();
   state.path = path;
   state.level = level;
+  state.currentFilter = "all";
+  if (level === "resources" && path.subject) addRecent(path.subject);
   renderApp();
 }
 
 window.addEventListener("hashchange", handleHash);
 
-function navigateToFaculties() {
-  window.location.hash = "";
+function navFaculties() {
+  location.hash = "";
 }
-function navigateToPrograms(facultyId) {
-  window.location.hash = `/${facultyId}`;
+function navPrograms(id) {
+  location.hash = `/${id}`;
 }
-function navigateToSemesters(programId) {
-  window.location.hash = `/${state.path.faculty}/${programId}`;
+function navSemesters(id) {
+  location.hash = `/${state.path.faculty}/${id}`;
 }
-function navigateToSubjects(semester) {
-  window.location.hash = `/${state.path.faculty}/${state.path.program}/${semester}`;
+function navSubjects(sem) {
+  location.hash = `/${state.path.faculty}/${state.path.program}/${sem}`;
 }
-function navigateToResources(subjectCode) {
-  window.location.hash = `/${state.path.faculty}/${state.path.program}/${state.path.semester}/${subjectCode}`;
+function navResources(code) {
+  location.hash = `/${state.path.faculty}/${state.path.program}/${state.path.semester}/${code}`;
 }
 
 // ================================================================
-//  RENDER FUNCTIONS
+//  RENDER
 // ================================================================
-function getCurrentFacultyData() {
+const LEVEL_NAMES = {
+  faculties: "Faculties",
+  programs: "Programs",
+  semesters: "Semesters",
+  subjects: "Subjects",
+  resources: "Resources",
+};
+
+function getFaculty() {
   return state.path.faculty ? DATA.faculties[state.path.faculty] : null;
 }
-function getCurrentProgramData() {
-  const faculty = getCurrentFacultyData();
-  return faculty && state.path.program
-    ? faculty.programs[state.path.program]
+function getProgram() {
+  const f = getFaculty();
+  return f && state.path.program ? f.programs[state.path.program] : null;
+}
+function getSemester() {
+  const p = getProgram();
+  return p && state.path.semester !== null
+    ? p.semesters.find((s) => s.semester === state.path.semester)
     : null;
 }
-function getCurrentSemesterData() {
-  const program = getCurrentProgramData();
-  return program && state.path.semester !== null
-    ? program.semesters.find((s) => s.semester === state.path.semester)
-    : null;
-}
+
 function getItems(level) {
-  switch (level) {
-    case "faculties":
-      return Object.keys(DATA.faculties).map((key) => ({
-        ...DATA.faculties[key],
-        id: key,
-      }));
-    case "programs": {
-      const faculty = getCurrentFacultyData();
-      return faculty
-        ? Object.keys(faculty.programs).map((key) => ({
-            ...faculty.programs[key],
-            id: key,
-          }))
-        : [];
-    }
-    case "semesters": {
-      const program = getCurrentProgramData();
-      return program
-        ? program.semesters.map((s) => ({ ...s, id: s.semester }))
-        : [];
-    }
-    case "subjects": {
-      const semester = getCurrentSemesterData();
-      return semester
-        ? semester.subjects.map((s) => ({ ...s, id: s.code }))
-        : [];
-    }
-    default:
-      return [];
+  if (level === "faculties")
+    return Object.keys(DATA.faculties).map((k) => ({
+      ...DATA.faculties[k],
+      id: k,
+    }));
+  if (level === "programs") {
+    const f = getFaculty();
+    return f
+      ? Object.keys(f.programs).map((k) => ({ ...f.programs[k], id: k }))
+      : [];
   }
+  if (level === "semesters") {
+    const p = getProgram();
+    return p ? p.semesters.map((s) => ({ ...s, id: s.semester })) : [];
+  }
+  if (level === "subjects") {
+    const s = getSemester();
+    return s ? s.subjects.map((sub) => ({ ...sub, id: sub.code })) : [];
+  }
+  return [];
 }
 
 function renderNav() {
-  const level = state.level;
-  const items = getItems(level);
-  const levelNames = {
-    faculties: "Faculties",
-    programs: "Programs",
-    semesters: "Semesters",
-    subjects: "Subjects",
-    resources: "Resources",
-  };
-  elements.navLabelText.textContent = levelNames[level] || "Items";
+  const items = getItems(state.level);
+  E.navLabelText.textContent = LEVEL_NAMES[state.level] || "Items";
 
-  if (level === "resources") {
-    elements.navList.innerHTML = `
-      <button class="nav-btn active" data-action="back-to-subjects">
-        <i class="fas fa-arrow-left"></i> 
-        <span class="nav-text">Back to Subjects</span>
-      </button>
-    `;
+  if (state.level === "resources") {
+    E.navList.innerHTML = `
+        <button class="nav-btn active" data-action="back-to-subjects" type="button">
+            <i class="fas fa-arrow-left"></i>
+            <span class="nav-text">Back to Subjects</span>
+        </button>`;
     return;
   }
 
   if (items.length === 0) {
-    elements.navList.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 13px;">No items</div>`;
+    E.navList.innerHTML = `<div style="padding: 16px; color: var(--text-muted); font-size: 13px;">No items</div>`;
     return;
   }
 
-  let html = "";
-  items.forEach((item) => {
-    const icon = item.icon || "fa-folder";
-    let label = item.name || `Item ${item.id}`;
-    let badge = "";
-    let action = "";
-    let dataId = "";
+  E.navList.innerHTML = items
+    .map((item) => {
+      const icon = item.icon || "fa-folder";
+      let label = item.name || `Item ${item.id}`;
+      let badge = "",
+        action = "",
+        dataId = "";
 
-    if (level === "faculties") {
-      badge = Object.keys(item.programs || {}).length;
-      action = "programs";
-      dataId = item.id;
-    } else if (level === "programs") {
-      badge = (item.semesters || []).length;
-      action = "semesters";
-      dataId = item.id;
-    } else if (level === "semesters") {
-      // Fix: show "Semester X" instead of "Item X"
-      label = `Semester ${item.semester}`;
-      badge = (item.subjects || []).length;
-      action = "subjects";
-      dataId = item.semester;
-    } else if (level === "subjects") {
-      badge = "📚";
-      action = "resources";
-      dataId = item.id;
-    }
+      if (state.level === "faculties") {
+        badge = Object.keys(item.programs || {}).length;
+        action = "programs";
+        dataId = item.id;
+      } else if (state.level === "programs") {
+        badge = (item.semesters || []).length;
+        action = "semesters";
+        dataId = item.id;
+      } else if (state.level === "semesters") {
+        label = `Semester ${item.semester}`;
+        badge = (item.subjects || []).length;
+        action = "subjects";
+        dataId = item.semester;
+      } else if (state.level === "subjects") {
+        badge = "📚";
+        action = "resources";
+        dataId = item.id;
+      }
 
-    html += `
-      <button class="nav-btn" data-action="${action}" data-id="${dataId}">
+      return `<button class="nav-btn" data-action="${action}" data-id="${escapeHtml(
+        String(dataId)
+      )}" type="button">
         <i class="fas ${icon}"></i>
-        <span class="nav-text">${label}</span>
+        <span class="nav-text">${escapeHtml(label)}</span>
         ${badge ? `<span class="badge">${badge}</span>` : ""}
-      </button>
-    `;
-  });
-  elements.navList.innerHTML = html;
+    </button>`;
+    })
+    .join("");
 }
 
 function renderContent() {
   const items = getItems(state.level);
-  const levelNames = {
-    faculties: "Faculties",
-    programs: "Programs",
-    semesters: "Semesters",
-    subjects: "Subjects",
-    resources: "Resources",
-  };
+  const levelName = LEVEL_NAMES[state.level] || "Items";
+  const lower = levelName.toLowerCase();
 
-  elements.currentLevelDisplay.textContent = levelNames[state.level] || "Items";
-  elements.currentItemDisplay.textContent =
-    items.length > 0
-      ? `(${items.length} ${levelNames[state.level]?.toLowerCase()})`
-      : "";
-  elements.totalCount.textContent = `${items.length} ${levelNames[
-    state.level
-  ]?.toLowerCase()}`;
+  E.currentLevelDisplay.textContent = levelName;
+  E.currentItemDisplay.textContent =
+    items.length > 0 ? `(${items.length} ${lower})` : "";
+  E.totalCount.textContent = `${items.length} ${lower}`;
+  E.footerStats.textContent = `${items.length} ${lower}`;
 
   updateHero();
 
-  elements.footerStats.textContent = `${items.length} ${levelNames[
-    state.level
-  ]?.toLowerCase()}`;
-
-  const contentArea = document.getElementById("contentArea");
-  let backNav = contentArea.querySelector(".back-nav");
-  if (backNav) backNav.remove();
+  E.contentArea.querySelector(".back-nav")?.remove();
   if (state.level !== "faculties") {
-    let backLabel = "",
-      backAction = "";
+    let label = "",
+      action = "";
     if (state.level === "programs") {
-      backLabel = "Back to Faculties";
-      backAction = "faculties";
+      label = "Back to Faculties";
+      action = "faculties";
     } else if (state.level === "semesters") {
-      backLabel = "Back to Programs";
-      backAction = "programs";
+      label = "Back to Programs";
+      action = "programs";
     } else if (state.level === "subjects") {
-      backLabel = "Back to Semesters";
-      backAction = "semesters";
+      label = "Back to Semesters";
+      action = "semesters";
     } else if (state.level === "resources") {
-      backLabel = "Back to Subjects";
-      backAction = "subjects";
+      label = "Back to Subjects";
+      action = "subjects";
     }
-    backNav = document.createElement("div");
+
+    const backNav = document.createElement("div");
     backNav.className = "back-nav";
-    backNav.innerHTML = `<button class="back-btn" data-action="${backAction}"><i class="fas fa-arrow-left"></i> ${backLabel}</button>`;
-    contentArea.insertBefore(backNav, elements.cardGrid);
+    backNav.innerHTML = `<button class="back-btn" data-action="${action}" type="button">
+        <i class="fas fa-arrow-left"></i> ${label}
+    </button>`;
+    E.contentArea.insertBefore(backNav, E.cardGrid);
+  }
+
+  // Hide filters when NOT on resources page
+  if (E.filters && state.level !== "resources") E.filters.hidden = true;
+
+  // Restore default grid layout when not showing resources
+  if (state.level !== "resources") {
+    E.cardGrid.style.gridTemplateColumns = "";
   }
 
   if (state.level === "resources") {
@@ -1013,546 +1513,941 @@ function renderContent() {
   }
 
   if (items.length === 0) {
-    elements.cardGrid.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>No items found</h3></div>`;
+    E.cardGrid.innerHTML = `<div class="empty-state"><i class="fas fa-folder-open"></i><h3>No items found</h3></div>`;
     return;
   }
 
-  let html = "";
-  items.forEach((item) => {
-    const icon = item.icon || "fa-folder";
-    let title = item.name || `Item ${item.id}`;
-    let subtitle = "",
-      badge = "",
-      action = "",
-      dataId = "";
+  E.cardGrid.innerHTML = items
+    .map((item) => {
+      const icon = item.icon || "fa-folder";
+      let title = item.name || `Item ${item.id}`;
+      let subtitle = "",
+        badge = "",
+        action = "",
+        dataId = "";
 
-    if (state.level === "faculties") {
-      subtitle = item.subtitle || "Faculty";
-      badge = Object.keys(item.programs || {}).length + " Programs";
-      action = "programs";
-      dataId = item.id;
-    } else if (state.level === "programs") {
-      subtitle = `${(item.semesters || []).length} Semesters`;
-      badge = `${(item.semesters || []).length} Sem`;
-      action = "semesters";
-      dataId = item.id;
-    } else if (state.level === "semesters") {
-      // Fix: show "Semester X" instead of "Item X"
-      title = `Semester ${item.semester}`;
-      subtitle = `${(item.subjects || []).length} Subjects`;
-      badge = `${(item.subjects || []).length} Subjects`;
-      action = "subjects";
-      dataId = item.semester;
-    } else if (state.level === "subjects") {
-      subtitle = item.code || "Subject";
-      badge = "📚 Resources";
-      action = "resources";
-      dataId = item.id;
-    }
+      if (state.level === "faculties") {
+        subtitle = item.subtitle || "Faculty";
+        badge = Object.keys(item.programs || {}).length + " Programs";
+        action = "programs";
+        dataId = item.id;
+      } else if (state.level === "programs") {
+        subtitle = `${(item.semesters || []).length} Semesters`;
+        badge = `${(item.semesters || []).length} Sem`;
+        action = "semesters";
+        dataId = item.id;
+      } else if (state.level === "semesters") {
+        title = `Semester ${item.semester}`;
+        subtitle = `${(item.subjects || []).length} Subjects`;
+        badge = `${(item.subjects || []).length} Subjects`;
+        action = "subjects";
+        dataId = item.semester;
+      } else if (state.level === "subjects") {
+        subtitle = item.code || "Subject";
+        badge = "📚 Resources";
+        action = "resources";
+        dataId = item.id;
+      }
 
-    html += `
-      <div class="card ${
-        state.level === "subjects" ? "subject-card" : ""
-      }" data-action="${action}" data-id="${dataId}">
-        ${badge ? `<span class="card-badge">${badge}</span>` : ""}
-        <div class="card-icon"><i class="fas ${icon}"></i></div>
-        <div class="card-title">${title}</div>
-        ${subtitle ? `<div class="card-subtitle">${subtitle}</div>` : ""}
+      const isSubject = state.level === "subjects";
+      const isFav = isSubject && isFavorite(item.code);
+
+      return `<div class="card ${isSubject ? "subject-card" : ""}"
+                 data-action="${action}"
+                 data-id="${escapeHtml(String(dataId))}"
+                 tabindex="0"
+                 role="button">
         ${
-          state.level === "subjects"
-            ? `
-          <div class="card-tags">
-            <span>📘 Syllabus</span>
-            <span>📝 Notes</span>
-            <span>📄 PYQs</span>
-            <span>📋 Assignments</span>
-          </div>
-        `
+          isSubject
+            ? `<button class="fav-btn ${isFav ? "active" : ""}"
+                       data-fav="${escapeHtml(item.code)}"
+                       data-name="${escapeHtml(item.name)}"
+                       aria-label="Toggle favorite"
+                       type="button">
+                   <i class="${isFav ? "fas" : "far"} fa-star"></i>
+               </button>
+               <button class="copy-link-btn"
+                       data-code="${escapeHtml(item.code)}"
+                       aria-label="Copy link"
+                       title="Copy link to this subject"
+                       type="button">
+                   <i class="fas fa-link"></i>
+               </button>`
             : ""
         }
-      </div>
-    `;
-  });
-  elements.cardGrid.innerHTML = html;
+        ${badge ? `<span class="card-badge">${badge}</span>` : ""}
+        <div class="card-icon"><i class="fas ${icon}"></i></div>
+        <div class="card-title">${escapeHtml(title)}</div>
+        ${
+          subtitle
+            ? `<div class="card-subtitle">${escapeHtml(subtitle)}</div>`
+            : ""
+        }
+        ${
+          isSubject
+            ? `<div class="card-tags">
+                   <span>📘 Syllabus</span>
+                   <span>📝 Notes</span>
+                   <span>📄 PYQs</span>
+                   <span>📋 Assignments</span>
+               </div>`
+            : ""
+        }
+    </div>`;
+    })
+    .join("");
+
   updateBreadcrumb();
+  updateStrips();
 }
 
 function updateHero() {
-  const level = state.level;
-  if (level === "faculties") {
-    elements.heroTitle.innerHTML =
+  const lvl = state.level;
+
+  if (lvl === "faculties") {
+    E.heroTitle.innerHTML =
       'Welcome to <br /><span class="gradient-text">MU Digital Library</span>';
-    elements.heroSubtext.textContent =
+    E.heroSubtext.textContent =
       "Use the search bar above or browse via the sidebar.";
-    elements.subtitleDisplay.textContent = "Mid-West University";
-  } else if (level === "programs") {
-    const faculty = getCurrentFacultyData();
-    elements.heroTitle.innerHTML = `${
-      faculty?.name || "Programs"
-    } <br /><span class="gradient-text">Explore Programs</span>`;
-    elements.heroSubtext.textContent = `Select a program under ${
-      faculty?.name || "this faculty"
+    E.subtitleDisplay.textContent = "Mid-West University";
+  } else if (lvl === "programs") {
+    const f = getFaculty();
+    E.heroTitle.innerHTML = `${escapeHtml(
+      f?.name || "Programs"
+    )} <br /><span class="gradient-text">Explore Programs</span>`;
+    E.heroSubtext.textContent = `Select a program under ${
+      f?.name || "this faculty"
     }.`;
-    elements.subtitleDisplay.textContent =
-      faculty?.name || "Mid-West University";
-  } else if (level === "semesters") {
-    const program = getCurrentProgramData();
-    elements.heroTitle.innerHTML = `${
-      program?.name || "Semesters"
-    } <br /><span class="gradient-text">Choose a Semester</span>`;
-    elements.heroSubtext.textContent = `Select a semester to view subjects.`;
-    elements.subtitleDisplay.textContent =
-      program?.name || "Mid-West University";
-  } else if (level === "subjects") {
-    const program = getCurrentProgramData();
-    elements.heroTitle.innerHTML = `Semester ${
+    E.subtitleDisplay.textContent = f?.name || "Mid-West University";
+  } else if (lvl === "semesters") {
+    const p = getProgram();
+    E.heroTitle.innerHTML = `${escapeHtml(
+      p?.name || "Semesters"
+    )} <br /><span class="gradient-text">Choose a Semester</span>`;
+    E.heroSubtext.textContent = "Select a semester to view subjects.";
+    E.subtitleDisplay.textContent = p?.name || "Mid-West University";
+  } else if (lvl === "subjects") {
+    const p = getProgram();
+    E.heroTitle.innerHTML = `Semester ${
       state.path.semester
-    } <br /><span class="gradient-text">${program?.name || "Subjects"}</span>`;
-    elements.heroSubtext.textContent = `Select a subject to access resources.`;
-    elements.subtitleDisplay.textContent = `${program?.name || ""} – Semester ${
+    } <br /><span class="gradient-text">${escapeHtml(
+      p?.name || "Subjects"
+    )}</span>`;
+    E.heroSubtext.textContent = "Select a subject to access resources.";
+    E.subtitleDisplay.textContent = `${p?.name || ""} – Semester ${
       state.path.semester
     }`;
-  } else if (level === "resources") {
-    const subject = state.path.subject;
-    elements.heroTitle.innerHTML = `${
-      subject?.name || "Subject"
-    } <br /><span class="gradient-text">Resources</span>`;
-    elements.heroSubtext.textContent = `Access syllabus, notes, past papers, and assignments.`;
-    elements.subtitleDisplay.textContent =
-      subject?.name || "Mid-West University";
+  } else if (lvl === "resources") {
+    const s = state.path.subject;
+    E.heroTitle.innerHTML = `${escapeHtml(
+      s?.name || "Subject"
+    )} <br /><span class="gradient-text">Resources</span>`;
+    E.heroSubtext.textContent =
+      "Access syllabus, notes, past papers, and assignments.";
+    E.subtitleDisplay.textContent = s?.name || "Mid-West University";
   }
 }
 
+// ================================================================
+//  RESOURCES VIEW
+// ================================================================
 function renderResources() {
   const subject = state.path.subject;
   if (!subject) {
-    elements.cardGrid.innerHTML = `<div class="empty-state"><h3>No subject selected</h3></div>`;
+    E.cardGrid.style.gridTemplateColumns = "";
+    E.cardGrid.innerHTML = `<div class="empty-state"><h3>No subject selected</h3></div>`;
     return;
   }
 
-  const resources = generateResourceContent(subject);
-  const html = `
-    <div class="card resource-card">
-      <div class="resource-header"><i class="fas fa-book-open"></i><h4>Syllabus</h4></div>
-      <p>${resources.syllabus}</p>
-      <div class="btn-group">
-        <button class="btn-download" data-action="view" data-type="syllabus" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.syllabusPdf || ""
-  }"><i class="fas fa-eye"></i> View</button>
-        <button class="btn-download download" data-action="download" data-type="syllabus" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.syllabusPdf || ""
-  }"><i class="fas fa-download"></i> Download</button>
-      </div>
+  const files = RESOURCES[subject.code] || {
+    syllabus: [],
+    notes: [],
+    pyq: [],
+    assignments: [],
+  };
+
+  const groups = [
+    {
+      key: "syllabus",
+      icon: "fa-book-open",
+      label: "Syllabus",
+      items: files.syllabus || [],
+    },
+    {
+      key: "notes",
+      icon: "fa-file-alt",
+      label: "Notes",
+      items: files.notes || [],
+    },
+    {
+      key: "pyq",
+      icon: "fa-file-pdf",
+      label: "Past Papers",
+      items: files.pyq || [],
+    },
+    {
+      key: "assignments",
+      icon: "fa-tasks",
+      label: "Assignments",
+      items: files.assignments || [],
+    },
+  ];
+
+  // Show filters ONLY here
+  if (E.filters) {
+    E.filters.hidden = false;
+    E.filters.querySelectorAll(".filter-chip").forEach((chip) => {
+      chip.classList.toggle(
+        "active",
+        chip.dataset.filter === state.currentFilter
+      );
+    });
+  }
+
+  const visible =
+    state.currentFilter === "all"
+      ? groups
+      : groups.filter((g) => g.key === state.currentFilter);
+
+  const totalFiles = groups.reduce((sum, g) => sum + g.items.length, 0);
+  if (totalFiles === 0) {
+    E.cardGrid.style.gridTemplateColumns = "";
+    E.cardGrid.innerHTML = `
+      <div class="empty-state" style="grid-column: 1/-1;">
+          <i class="fas fa-clock"></i>
+          <h3>Resources coming soon</h3>
+          <p>Files for <strong>${escapeHtml(
+            subject.name
+          )}</strong> haven't been uploaded yet. Check back later!</p>
+      </div>`;
+    updateBreadcrumb();
+    return;
+  }
+
+  E.cardGrid.style.gridTemplateColumns = "1fr";
+  E.cardGrid.innerHTML = visible
+    .map(
+      (g) => `
+    <div class="res-group">
+        <div class="res-group-head">
+            <i class="fas ${g.icon}"></i>
+            <h4>${g.label}</h4>
+            <span class="count">${g.items.length}</span>
+        </div>
+        <div class="res-list">
+            ${
+              g.items.length > 0
+                ? g.items
+                    .map(
+                      (file) => `
+                  <div class="res-item">
+                      <i class="fas fa-file-pdf"></i>
+                      <div class="res-info">
+                          <div class="res-title">${escapeHtml(file.title)}</div>
+                          ${
+                            file.year || file.author
+                              ? `<div class="res-meta">${[
+                                  file.year,
+                                  file.author,
+                                ]
+                                  .filter(Boolean)
+                                  .map(escapeHtml)
+                                  .join(" · ")}</div>`
+                              : ""
+                          }
+                      </div>
+                      <div class="res-actions">
+                          <button class="res-btn view"
+                                  data-url="${escapeHtml(file.url)}"
+                                  type="button"
+                                  title="Open in new tab">
+                              <i class="fas fa-eye"></i> View
+                          </button>
+                          <button class="res-btn download"
+                                  data-url="${escapeHtml(file.url)}"
+                                  data-subject="${escapeHtml(subject.name)}"
+                                  data-code="${escapeHtml(subject.code)}"
+                                  data-title="${escapeHtml(file.title)}"
+                                  type="button"
+                                  title="Download PDF">
+                              <i class="fas fa-download"></i> Download
+                          </button>
+                      </div>
+                  </div>
+              `
+                    )
+                    .join("")
+                : `<div class="res-empty"><i class="fas fa-clock"></i> Coming soon</div>`
+            }
+        </div>
     </div>
-    <div class="card resource-card">
-      <div class="resource-header"><i class="fas fa-file-alt"></i><h4>Notes</h4></div>
-      <ul>${resources.notes
-        .map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`)
-        .join("")}</ul>
-      <div class="btn-group">
-        <button class="btn-download" data-action="view" data-type="notes" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.notesPdf || ""
-  }"><i class="fas fa-eye"></i> View</button>
-        <button class="btn-download download" data-action="download" data-type="notes" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.notesPdf || ""
-  }"><i class="fas fa-download"></i> Download</button>
-      </div>
-    </div>
-    <div class="card resource-card">
-      <div class="resource-header"><i class="fas fa-file-pdf"></i><h4>Past Year Questions</h4></div>
-      <ul>${resources.pyq
-        .map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`)
-        .join("")}</ul>
-      <div class="btn-group">
-        <button class="btn-download" data-action="view" data-type="pyq" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.pyqPdf || ""
-  }"><i class="fas fa-eye"></i> View</button>
-        <button class="btn-download download" data-action="download" data-type="pyq" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.pyqPdf || ""
-  }"><i class="fas fa-download"></i> Download</button>
-      </div>
-    </div>
-    <div class="card resource-card">
-      <div class="resource-header"><i class="fas fa-tasks"></i><h4>Assignments</h4></div>
-      <ul>${resources.assignments
-        .map((t) => `<li><i class="fas fa-check-circle"></i> ${t}</li>`)
-        .join("")}</ul>
-      <div class="btn-group">
-        <button class="btn-download" data-action="view" data-type="assignments" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.assignmentsPdf || ""
-  }"><i class="fas fa-eye"></i> View</button>
-        <button class="btn-download download" data-action="download" data-type="assignments" data-code="${
-          subject.code
-        }" data-name="${subject.name}" data-pdf="${
-    resources.assignmentsPdf || ""
-  }"><i class="fas fa-download"></i> Download</button>
-      </div>
-    </div>
-  `;
-  elements.cardGrid.innerHTML = html;
+  `
+    )
+    .join("");
+
   updateBreadcrumb();
 }
 
-function generateResourceContent(subject) {
-  let syllabusText = `Complete syllabus as per the latest curriculum.`;
-  const name = subject.name;
-  if (name.includes("Mathematics") || name.includes("Maths"))
-    syllabusText =
-      "Calculus, algebra, differential equations, transforms, and numerical methods.";
-  else if (name.includes("Programming") || name.includes("Data Structures"))
-    syllabusText =
-      "Algorithms, data structures, OOP, and software development fundamentals.";
-  else if (name.includes("Hydraulics") || name.includes("Fluid"))
-    syllabusText =
-      "Fluid properties, statics, dynamics, pipe flow, and open channel hydraulics.";
-  else if (name.includes("Database") || name.includes("DBMS"))
-    syllabusText =
-      "SQL, normalization, transaction management, and database design.";
-  else if (name.includes("Networks") || name.includes("CN"))
-    syllabusText =
-      "OSI model, TCP/IP, routing, switching, and network security.";
-  else if (name.includes("Machine Learning") || name.includes("AI"))
-    syllabusText =
-      "Supervised/unsupervised learning, neural networks, NLP, and computer vision.";
-  else if (name.includes("Dam") || name.includes("Turbine"))
-    syllabusText =
-      "Dam types, design, turbine selection, and powerhouse layout.";
-  else if (name.includes("Management") || name.includes("Business"))
-    syllabusText =
-      "Management principles, OB, marketing, finance, and business strategy.";
-  else if (name.includes("Physics"))
-    syllabusText =
-      "Mechanics, electromagnetism, thermodynamics, quantum physics, and optics.";
-
-  const topics = [
-    "Introduction & fundamental concepts",
-    "Core principles & theorems",
-    "Problem-solving techniques",
-    "Case studies & applications",
-    "Advanced topics",
-  ];
-  const pyqTopics = [
-    "End semester papers (latest 5 years)",
-    "Mid-semester test papers",
-    "Tutorial & practice problems",
-    "Solution sets with explanations",
-    "Model answer keys",
-  ];
-  const assignTopics = [
-    "Assignment 1: Basic problems",
-    "Assignment 2: Intermediate problems",
-    "Assignment 3: Advanced problems",
-    "Mini-project / practical work",
-    "Group discussion topics",
-  ];
-
-  const pdfMap = {
-    CE411_notes: "applied_mechanics-I_note.pdf",
-    SH421_syllabus: "mathematics-II_syllabus.pdf",
-  };
-
-  const getPdfUrl = (type) => {
-    const key = `${subject.code}_${type}`;
-    return pdfMap[key] || null;
-  };
-
-  return {
-    syllabus: syllabusText,
-    notes: topics,
-    pyq: pyqTopics,
-    assignments: assignTopics,
-    syllabusPdf: getPdfUrl("syllabus"),
-    notesPdf: getPdfUrl("notes"),
-    pyqPdf: getPdfUrl("pyq"),
-    assignmentsPdf: getPdfUrl("assignments"),
-  };
-}
-
 function updateBreadcrumb() {
-  let items = [{ label: "🏛️ Faculties", level: "faculties" }];
-  if (state.path.faculty) {
+  const items = [{ label: "🏛️ Faculties", level: "faculties" }];
+  if (state.path.faculty)
     items.push({
       label: DATA.faculties[state.path.faculty]?.name || state.path.faculty,
       level: "programs",
     });
-  }
-  if (state.path.program) {
-    const program = getCurrentProgramData();
+  if (state.path.program)
     items.push({
-      label: program?.name || state.path.program,
+      label: getProgram()?.name || state.path.program,
       level: "semesters",
     });
-  }
-  if (state.path.semester !== null) {
+  if (state.path.semester !== null)
     items.push({ label: `Semester ${state.path.semester}`, level: "subjects" });
-  }
-  if (state.level === "resources" && state.path.subject) {
+  if (state.level === "resources" && state.path.subject)
     items.push({ label: state.path.subject.name, level: "resources" });
-  }
 
-  let html = "";
-  items.forEach((item, index) => {
-    const isActive = index === items.length - 1;
-    html += `
-      <span class="breadcrumb-item ${isActive ? "active" : ""}" 
-            data-action="${item.level}" 
-            style="${isActive ? "" : "cursor:pointer;"}">
-        ${item.label}
-      </span>
-    `;
-  });
-  elements.breadcrumb.innerHTML = html;
+  E.breadcrumb.innerHTML = items
+    .map((item, i) => {
+      const isActive = i === items.length - 1;
+      return `<span class="breadcrumb-item ${
+        isActive ? "active" : ""
+      }" data-action="${item.level}">${escapeHtml(item.label)}</span>`;
+    })
+    .join("");
 }
 
 // ================================================================
-//  MODAL HANDLING
+//  MODAL (kept for compatibility)
 // ================================================================
-function openResourceModal(type, code, name, pdfUrl = null) {
+function openModal(type, code, name, pdfUrl) {
   if (pdfUrl) {
-    elements.modalBody.innerHTML = `<div class="pdf-viewer"><iframe src="${pdfUrl}" width="100%" height="500px" style="border: none; border-radius: 8px;"></iframe></div>`;
+    E.modalBody.innerHTML = `<div class="pdf-viewer"><iframe src="${escapeHtml(
+      pdfUrl
+    )}" title="${escapeHtml(name)} ${escapeHtml(
+      type
+    )}" loading="lazy"></iframe></div>`;
   } else {
-    let pagesHtml = "";
+    let pages = "";
     for (let i = 1; i <= 5; i++) {
-      pagesHtml += `<div class="pdf-page"><h4>${name} – ${type} (Page ${i})</h4><p>Simulated content...</p></div>`;
+      pages += `<div class="pdf-page">
+          <h4>${escapeHtml(name)} – ${escapeHtml(type)} (Page ${i})</h4>
+          <p>Simulated preview content.</p>
+      </div>`;
     }
-    elements.modalBody.innerHTML = `<div class="pdf-scroll-container">${pagesHtml}</div>`;
+    E.modalBody.innerHTML = `<div class="pdf-scroll-container">${pages}</div>`;
   }
-  elements.modalTitle.textContent = `${name} (${code}) - ${type}`;
-  elements.modal.style.display = "flex";
-  elements.modal.querySelector(".modal-close").focus();
+  E.modalTitle.textContent = `${name} (${code}) - ${type}`;
+  E.modal.hidden = false;
+  document.body.style.overflow = "hidden";
+  E.modalClose.focus();
 }
 
-function closeResourceModal() {
-  elements.modal.style.display = "none";
-}
-
-function downloadResource(type, code, name, pdfUrl = null) {
-  if (pdfUrl) {
-    const a = document.createElement("a");
-    a.href = pdfUrl;
-    a.download = `${name.replace(/\s+/g, "_")}_${type}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-  } else {
-    const content = `Resource: ${name} (${code})\nType: ${type}\nThis is a simulated download.`;
-    const blob = new Blob([content], { type: "text/plain" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${name.replace(/\s+/g, "_")}_${type}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
+function closeModal() {
+  E.modal.hidden = true;
+  document.body.style.overflow = "";
 }
 
 // ================================================================
-//  EVENT DELEGATION (cards and nav)
+//  EVENT DELEGATION
 // ================================================================
-elements.navList.addEventListener("click", (e) => {
+E.navList.addEventListener("click", (e) => {
   const btn = e.target.closest(".nav-btn");
   if (!btn) return;
   const { action, id } = btn.dataset;
-  if (action === "back-to-subjects") {
-    navigateToSubjects(state.path.semester);
+  if (action === "back-to-subjects") return navSubjects(state.path.semester);
+  if (action === "programs") navPrograms(id);
+  else if (action === "semesters") navSemesters(id);
+  else if (action === "subjects") navSubjects(id);
+  else if (action === "resources") navResources(id);
+});
+
+// Filter chip handler
+E.filters?.addEventListener("click", (e) => {
+  const chip = e.target.closest(".filter-chip");
+  if (!chip) return;
+  state.currentFilter = chip.dataset.filter;
+  renderResources();
+});
+
+// Card grid click handler — handles fav, copy link, view, download, and card nav
+E.cardGrid.addEventListener("click", (e) => {
+  // Favorite toggle
+  const fav = e.target.closest(".fav-btn");
+  if (fav) {
+    e.stopPropagation();
+    toggleFavorite(fav.dataset.fav, fav.dataset.name);
     return;
   }
-  switch (action) {
-    case "faculties":
-      navigateToFaculties();
-      break;
-    case "programs":
-      navigateToPrograms(id);
-      break;
-    case "semesters":
-      navigateToSemesters(id);
-      break;
-    case "subjects":
-      navigateToSubjects(id);
-      break;
-    case "resources":
-      navigateToResources(id);
-      break;
-  }
-});
 
-elements.cardGrid.addEventListener("click", (e) => {
+  // Copy link
+  const copyBtn = e.target.closest(".copy-link-btn");
+  if (copyBtn) {
+    e.stopPropagation();
+    const code = copyBtn.dataset.code;
+    const url = `${location.origin}${location.pathname}#${state.path.faculty}/${state.path.program}/${state.path.semester}/${code}`;
+    (async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        showToast("Link copied to clipboard", "success", "fa-link");
+      } catch {
+        const ta = document.createElement("textarea");
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        showToast("Link copied", "success", "fa-link");
+      }
+    })();
+    return;
+  }
+
+  // View button
+  const viewBtn = e.target.closest(".res-btn.view");
+  if (viewBtn) {
+    e.stopPropagation();
+    window.open(viewBtn.dataset.url, "_blank", "noopener");
+    return;
+  }
+
+  // Download button (with full subject name in the filename)
+  const dlBtn = e.target.closest(".res-btn.download");
+  if (dlBtn) {
+    e.stopPropagation();
+    const url = dlBtn.dataset.url;
+    const subjectName = dlBtn.dataset.subject || "Resource";
+    const title = dlBtn.dataset.title || "File";
+    const ext = (url.split("?")[0].split(".").pop() || "pdf").toLowerCase();
+
+    // "Engineering Mathematics I - Unit 1-2 Limits, Continuity & Derivatives.pdf"
+    const filename = `${subjectName} - ${title}.${ext}`
+      .replace(/[\\/:*?"<>|]/g, "_")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 180);
+
+    (async () => {
+      try {
+        const res = await fetch(url, { mode: "cors" });
+        if (!res.ok) throw new Error("Network response not ok");
+        const blob = await res.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(blobUrl);
+        showToast(`Downloading "${filename}"`, "success", "fa-download");
+      } catch {
+        // Fallback: direct link (browser may override filename)
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        a.target = "_blank";
+        a.rel = "noopener";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        showToast(`Opening "${title}"`, "info", "fa-download");
+      }
+    })();
+    return;
+  }
+
+  // Card navigation (for hierarchy levels)
   const card = e.target.closest(".card");
-  if (!card) return;
-  if (card.classList.contains("resource-card")) {
-    const btn = e.target.closest(".btn-download");
-    if (btn) {
-      const { action, type, code, name, pdf } = btn.dataset;
-      if (action === "view") openResourceModal(type, code, name, pdf);
-      else if (action === "download") downloadResource(type, code, name, pdf);
-      return;
-    }
-  } else {
-    const { action, id } = card.dataset;
-    switch (action) {
-      case "programs":
-        navigateToPrograms(id);
-        break;
-      case "semesters":
-        navigateToSemesters(id);
-        break;
-      case "subjects":
-        navigateToSubjects(id);
-        break;
-      case "resources":
-        navigateToResources(id);
-        break;
-    }
-  }
+  if (!card || card.classList.contains("resource-card")) return;
+  const { action, id } = card.dataset;
+  if (action === "programs") navPrograms(id);
+  else if (action === "semesters") navSemesters(id);
+  else if (action === "subjects") navSubjects(id);
+  else if (action === "resources") navResources(id);
 });
 
-elements.breadcrumb.addEventListener("click", (e) => {
+E.cardGrid.addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const card = e.target.closest(".card:not(.resource-card)");
+  if (!card) return;
+  e.preventDefault();
+  card.click();
+});
+
+E.breadcrumb.addEventListener("click", (e) => {
   const item = e.target.closest(".breadcrumb-item");
   if (!item || item.classList.contains("active")) return;
   const { action } = item.dataset;
-  if (action === "faculties") navigateToFaculties();
-  else if (action === "programs") navigateToPrograms(state.path.faculty);
-  else if (action === "semesters") navigateToSemesters(state.path.program);
-  else if (action === "subjects") navigateToSubjects(state.path.semester);
+  if (action === "faculties") navFaculties();
+  else if (action === "programs") navPrograms(state.path.faculty);
+  else if (action === "semesters") navSemesters(state.path.program);
+  else if (action === "subjects") navSubjects(state.path.semester);
 });
 
 document.addEventListener("click", (e) => {
   const backBtn = e.target.closest(".back-btn");
-  if (!backBtn) return;
-  const { action } = backBtn.dataset;
-  if (action === "faculties") navigateToFaculties();
-  else if (action === "programs") navigateToPrograms(state.path.faculty);
-  else if (action === "semesters") navigateToSemesters(state.path.program);
-  else if (action === "subjects") navigateToSubjects(state.path.semester);
+  if (backBtn) {
+    const { action } = backBtn.dataset;
+    if (action === "faculties") navFaculties();
+    else if (action === "programs") navPrograms(state.path.faculty);
+    else if (action === "semesters") navSemesters(state.path.program);
+    else if (action === "subjects") navSubjects(state.path.semester);
+    return;
+  }
+
+  const removeBtn = e.target.closest(".chip-remove");
+  if (removeBtn) {
+    e.stopPropagation();
+    e.preventDefault();
+    const code = removeBtn.dataset.remove;
+    if (code) removeFavorite(code);
+    return;
+  }
+
+  const chip = e.target.closest(".strip-chip");
+  if (chip && chip.dataset.code) {
+    const found = findSubjectByCode(chip.dataset.code);
+    if (found) {
+      location.hash = `/${found.faculty}/${found.program}/${found.semester}/${found.code}`;
+    }
+    return;
+  }
+
+  const clear = e.target.closest(".strip-clear");
+  if (clear) {
+    if (clear.dataset.clear === "favorites") clearFavorites();
+    else if (clear.dataset.clear === "recent") clearRecent();
+    return;
+  }
+
+  const quick = e.target.closest(".quick-btn");
+  if (quick) {
+    const q = quick.dataset.quick;
+    if (q === "favorites") {
+      if (state.favorites.length === 0)
+        showToast(
+          "No favorites yet — click ⭐ on any subject",
+          "info",
+          "fa-star"
+        );
+      else
+        E.favoritesStrip.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (q === "recent") {
+      if (state.recent.length === 0)
+        showToast(
+          "No recently viewed subjects",
+          "info",
+          "fa-clock-rotate-left"
+        );
+      else E.recentStrip.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else if (q === "command") {
+      openCommand();
+    }
+  }
 });
 
-// ================================================================
-//  MODAL CLOSE
-// ================================================================
-elements.modal.addEventListener("click", (e) => {
-  if (e.target === elements.modal) closeResourceModal();
+E.modal?.addEventListener("click", (e) => {
+  if (e.target === E.modal) closeModal();
 });
-elements.modal
-  .querySelector(".modal-close")
-  .addEventListener("click", closeResourceModal);
+E.modalClose?.addEventListener("click", closeModal);
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && elements.modal.style.display === "flex")
-    closeResourceModal();
+  if (e.key === "Escape" && !E.modal.hidden) closeModal();
 });
 
 // ================================================================
-//  SIDEBAR TOGGLE
+//  SIDEBAR
 // ================================================================
-function loadSidebarState() {
-  const saved = localStorage.getItem("muSidebarCollapsed");
-  if (saved === "true") {
-    elements.sidebar.classList.add("collapsed");
-    elements.sidebarToggle.querySelector("i").className =
-      "fas fa-chevron-right";
-  } else {
-    elements.sidebar.classList.remove("collapsed");
-    elements.sidebarToggle.querySelector("i").className = "fas fa-chevron-left";
+function loadSidebar() {
+  if (
+    localStorage.getItem("muSidebarCollapsed") === "true" &&
+    window.innerWidth > 768
+  ) {
+    E.sidebar.classList.add("collapsed");
+    const icon = E.sidebarToggle.querySelector("i");
+    if (icon) icon.className = "fas fa-chevron-right";
   }
 }
-function saveSidebarState() {
+function saveSidebar() {
   localStorage.setItem(
     "muSidebarCollapsed",
-    elements.sidebar.classList.contains("collapsed")
+    E.sidebar.classList.contains("collapsed")
   );
 }
-elements.sidebarToggle.addEventListener("click", () => {
-  elements.sidebar.classList.toggle("collapsed");
-  const icon = elements.sidebarToggle.querySelector("i");
-  icon.className = elements.sidebar.classList.contains("collapsed")
-    ? "fas fa-chevron-right"
-    : "fas fa-chevron-left";
-  saveSidebarState();
+
+E.sidebarToggle?.addEventListener("click", () => {
+  E.sidebar.classList.toggle("collapsed");
+  const icon = E.sidebarToggle.querySelector("i");
+  if (icon) {
+    icon.className = E.sidebar.classList.contains("collapsed")
+      ? "fas fa-chevron-right"
+      : "fas fa-chevron-left";
+  }
+  saveSidebar();
 });
-loadSidebarState();
+
+loadSidebar();
 
 function toggleSidebar(open) {
-  if (window.innerWidth <= 768) {
-    elements.sidebar.classList.remove("collapsed");
-  }
+  if (window.innerWidth <= 768) E.sidebar.classList.remove("collapsed");
   if (open === undefined) {
-    elements.sidebar.classList.toggle("open");
-    elements.overlay.classList.toggle("active");
+    E.sidebar.classList.toggle("open");
+    E.overlay.classList.toggle("active");
   } else {
-    elements.sidebar.classList.toggle("open", open);
-    elements.overlay.classList.toggle("active", open);
+    E.sidebar.classList.toggle("open", open);
+    E.overlay.classList.toggle("active", open);
   }
-  const isOpen = elements.sidebar.classList.contains("open");
-  elements.hamburger.setAttribute("aria-expanded", isOpen);
+  const isOpen = E.sidebar.classList.contains("open");
+  E.hamburger.setAttribute("aria-expanded", isOpen);
   document.body.style.overflow = isOpen ? "hidden" : "";
 }
-elements.hamburger.addEventListener("click", () => toggleSidebar());
-elements.overlay.addEventListener("click", () => toggleSidebar(false));
-elements.sidebarCloseBtn.addEventListener("click", () => toggleSidebar(false));
+
+E.hamburger?.addEventListener("click", () => toggleSidebar());
+E.overlay?.addEventListener("click", () => toggleSidebar(false));
+E.sidebarCloseBtn?.addEventListener("click", () => toggleSidebar(false));
+
 window.addEventListener("resize", () => {
-  if (window.innerWidth > 768 && elements.sidebar.classList.contains("open")) {
+  if (window.innerWidth > 768 && E.sidebar.classList.contains("open"))
     toggleSidebar(false);
-  }
-  if (window.innerWidth <= 768) {
-    elements.sidebar.classList.remove("collapsed");
-  }
+  if (window.innerWidth <= 768) E.sidebar.classList.remove("collapsed");
 });
 
 // ================================================================
-//  THEME TOGGLE
+//  THEME & ACCENT
 // ================================================================
 function applyTheme(theme) {
   if (theme === "dark") {
     document.documentElement.setAttribute("data-theme", "dark");
-    elements.themeIcon.className = "fas fa-sun";
-    localStorage.setItem("muTheme", "dark");
+    E.themeIcon.className = "fas fa-sun";
+    E.themeToggle.setAttribute("aria-label", "Switch to light mode");
   } else {
     document.documentElement.removeAttribute("data-theme");
-    elements.themeIcon.className = "fas fa-moon";
-    localStorage.setItem("muTheme", "light");
+    E.themeIcon.className = "fas fa-moon";
+    E.themeToggle.setAttribute("aria-label", "Switch to dark mode");
   }
+  localStorage.setItem("muTheme", theme);
+  state.theme = theme;
 }
-elements.themeToggle.addEventListener("click", () => {
-  const currentTheme = document.documentElement.getAttribute("data-theme");
-  applyTheme(currentTheme === "dark" ? "light" : "dark");
+
+function applyAccent(name) {
+  const a = ACCENTS[name] || ACCENTS.teal;
+  document.documentElement.style.setProperty("--accent", a.color);
+  document.documentElement.style.setProperty("--accent-hover", a.hover);
+  document.documentElement.style.setProperty("--accent-soft", a.soft);
+  localStorage.setItem("muAccent", name);
+  state.accent = name;
+  E.accentMenu.querySelectorAll("button").forEach((b) => {
+    b.classList.toggle("active", b.dataset.accent === name);
+  });
+}
+
+E.themeToggle?.addEventListener("click", () => {
+  applyTheme(state.theme === "dark" ? "light" : "dark");
 });
-applyTheme(localStorage.getItem("muTheme") || "light");
+
+E.accentToggle?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  E.accentMenu.classList.toggle("active");
+});
+
+E.accentMenu?.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-accent]");
+  if (!btn) return;
+  applyAccent(btn.dataset.accent);
+  E.accentMenu.classList.remove("active");
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".accent-picker"))
+    E.accentMenu?.classList.remove("active");
+});
+
+applyTheme(state.theme);
+applyAccent(state.accent);
 
 // ================================================================
-//  BACK TO TOP
+//  SCROLL PROGRESS + BACK TO TOP
 // ================================================================
-window.addEventListener("scroll", () => {
-  elements.backToTopBtn.style.display = window.scrollY > 300 ? "flex" : "none";
-});
-elements.backToTopBtn.addEventListener("click", () => {
+window.addEventListener(
+  "scroll",
+  () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    E.scrollProgress.style.width =
+      h > 0 ? `${(window.scrollY / h) * 100}%` : "0%";
+    E.backToTopBtn.classList.toggle("visible", window.scrollY > 300);
+  },
+  { passive: true }
+);
+
+E.backToTopBtn?.addEventListener("click", () => {
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
 // ================================================================
-//  INITIALIZATION
+//  GLOBAL SHORTCUTS
+// ================================================================
+document.addEventListener("keydown", (e) => {
+  const isMac = navigator.platform.toUpperCase().includes("MAC");
+  const mod = isMac ? e.metaKey : e.ctrlKey;
+  const tag = document.activeElement?.tagName;
+  const isTyping = tag === "INPUT" || tag === "TEXTAREA";
+
+  if (mod && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    openCommand();
+  } else if (mod && e.key.toLowerCase() === "b") {
+    e.preventDefault();
+    if (window.innerWidth > 768) E.sidebarToggle.click();
+  } else if (mod && e.key.toLowerCase() === "j") {
+    e.preventDefault();
+    E.themeToggle.click();
+  } else if (e.key === "/" && !isTyping) {
+    e.preventDefault();
+    (window.innerWidth <= 768 ? E.mobileSearchInput : E.searchInput).focus();
+  }
+});
+
+// ================================================================
+//  FINE INTERACTIVE GRID
+// ================================================================
+function initInteractiveGrid() {
+  const grid = document.getElementById("bgGrid");
+  if (!grid) return;
+
+  const CELL = 56;
+  const RADIUS = 220;
+  const MAX_OPACITY = 0.85;
+
+  let cols = 0,
+    rows = 0;
+  let cellByRC = [];
+  let activeSet = new Set();
+
+  let pendingX = -9999,
+    pendingY = -9999;
+  let mouseX = -9999,
+    mouseY = -9999;
+  let isActive = false;
+  let rafId = null;
+
+  function build() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    cols = Math.ceil(w / CELL) + 1;
+    rows = Math.ceil(h / CELL) + 1;
+
+    grid.style.gridTemplateColumns = `repeat(${cols}, ${CELL}px)`;
+    grid.style.gridAutoRows = `${CELL}px`;
+    grid.innerHTML = "";
+
+    const frag = document.createDocumentFragment();
+    cellByRC = [];
+
+    for (let r = 0; r < rows; r++) {
+      const rowArr = new Array(cols);
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        frag.appendChild(cell);
+        rowArr[c] = cell;
+      }
+      cellByRC.push(rowArr);
+    }
+    grid.appendChild(frag);
+    activeSet.clear();
+  }
+
+  function paint() {
+    rafId = null;
+    mouseX = pendingX;
+    mouseY = pendingY;
+
+    if (!isActive) {
+      if (activeSet.size > 0) {
+        activeSet.forEach((cell) =>
+          cell.style.setProperty("--cell-opacity", "0")
+        );
+        activeSet.clear();
+      }
+      return;
+    }
+
+    const minC = Math.max(0, Math.floor((mouseX - RADIUS) / CELL));
+    const maxC = Math.min(cols - 1, Math.ceil((mouseX + RADIUS) / CELL));
+    const minR = Math.max(0, Math.floor((mouseY - RADIUS) / CELL));
+    const maxR = Math.min(rows - 1, Math.ceil((mouseY + RADIUS) / CELL));
+
+    activeSet.forEach((cell) => {
+      const r = +cell.dataset.r;
+      const c = +cell.dataset.c;
+      if (r < minR || r > maxR || c < minC || c > maxC) {
+        cell.style.setProperty("--cell-opacity", "0");
+        activeSet.delete(cell);
+      }
+    });
+
+    for (let r = minR; r <= maxR; r++) {
+      const rowArr = cellByRC[r];
+      if (!rowArr) continue;
+      const cy = r * CELL + CELL / 2;
+
+      for (let c = minC; c <= maxC; c++) {
+        const cell = rowArr[c];
+        if (!cell) continue;
+
+        const cx = c * CELL + CELL / 2;
+        const dx = mouseX - cx;
+        const dy = mouseY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist < RADIUS) {
+          const t = 1 - dist / RADIUS;
+          const eased = t * t * t;
+          const opacity = (eased * MAX_OPACITY).toFixed(3);
+          cell.style.setProperty("--cell-opacity", opacity);
+          activeSet.add(cell);
+        } else if (activeSet.has(cell)) {
+          cell.style.setProperty("--cell-opacity", "0");
+          activeSet.delete(cell);
+        }
+      }
+    }
+  }
+
+  function schedule() {
+    if (!rafId) rafId = requestAnimationFrame(paint);
+  }
+
+  window.addEventListener(
+    "mousemove",
+    (e) => {
+      pendingX = e.clientX;
+      pendingY = e.clientY;
+      isActive = true;
+      schedule();
+    },
+    { passive: true }
+  );
+
+  document.addEventListener("mouseleave", () => {
+    isActive = false;
+    schedule();
+  });
+  window.addEventListener("blur", () => {
+    isActive = false;
+    schedule();
+  });
+
+  window.addEventListener(
+    "touchstart",
+    (e) => {
+      if (!e.touches[0]) return;
+      pendingX = e.touches[0].clientX;
+      pendingY = e.touches[0].clientY;
+      isActive = true;
+      schedule();
+    },
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!e.touches[0]) return;
+      pendingX = e.touches[0].clientX;
+      pendingY = e.touches[0].clientY;
+      isActive = true;
+      schedule();
+    },
+    { passive: true }
+  );
+
+  window.addEventListener("touchend", () => {
+    isActive = false;
+    schedule();
+  });
+
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(build, 180);
+  });
+
+  build();
+}
+
+// ================================================================
+//  PWA INSTALL BANNER
+// ================================================================
+let deferredInstallPrompt = null;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+
+  const lastDismiss = parseInt(
+    localStorage.getItem("muInstallDismissed") || "0"
+  );
+  if (Date.now() - lastDismiss < 7 * 24 * 60 * 60 * 1000) return;
+
+  const banner = document.createElement("div");
+  banner.className = "install-banner";
+  banner.innerHTML = `
+    <div class="ib-icon"><i class="fas fa-graduation-cap"></i></div>
+    <div class="ib-text">
+      <strong>Install MU Library</strong>
+      <small>Add to home screen for offline access</small>
+    </div>
+    <button class="ib-install">Install</button>
+    <button class="ib-dismiss" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+  `;
+  document.body.appendChild(banner);
+
+  requestAnimationFrame(() => banner.classList.add("show"));
+
+  banner.querySelector(".ib-install").addEventListener("click", async () => {
+    banner.classList.remove("show");
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    setTimeout(() => banner.remove(), 400);
+  });
+
+  banner.querySelector(".ib-dismiss").addEventListener("click", () => {
+    banner.classList.remove("show");
+    localStorage.setItem("muInstallDismissed", String(Date.now()));
+    setTimeout(() => banner.remove(), 400);
+  });
+});
+
+window.addEventListener("appinstalled", () => {
+  deferredInstallPrompt = null;
+  showToast("MU Library installed!", "success", "fa-download");
+});
+
+// ================================================================
+//  INIT
 // ================================================================
 function renderApp() {
   renderNav();
   renderContent();
 }
 
-if (window.location.hash) {
-  handleHash();
+updateQuickCounts();
+updateStrips();
+handleHash();
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initInteractiveGrid);
 } else {
-  handleHash();
+  initInteractiveGrid();
 }
+
+console.log(
+  "%c📚 MU Library — Modern Edition",
+  "font-size: 16px; font-weight: bold; color: #2d9cdb;"
+);
+console.log(
+  "%c⌨️  Ctrl+K command palette · Ctrl+B sidebar · Ctrl+J theme · / search",
+  "color: #64748b;"
+);
