@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="MU Library – Free study resources for Mid-West University students across all faculties." />
     <meta name="theme-color" content="#2d9cdb" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f172a" />
     <title>MU Library – Mid-West University</title>
+
+    <meta property="og:title" content="MU Library – Mid-West University" />
+    <meta property="og:description" content="Free notes, past papers, and assignments for MU students." />
+    <meta property="og:type" content="website" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
@@ -19,11 +25,13 @@
 </head>
 <body>
 
-    <!-- Interactive grid background -->
     <div class="bg-grid" id="bgGrid" aria-hidden="true"></div>
-
-    <!-- Scroll progress bar -->
     <div class="scroll-progress" id="scrollProgress"></div>
+
+    <div class="net-banner" id="netBanner" hidden>
+        <i class="fas fa-wifi-slash"></i>
+        <span>You're offline — cached files still work</span>
+    </div>
 
     <a href="#contentArea" class="skip-link">Skip to content</a>
 
@@ -49,6 +57,9 @@
                 <i class="fas fa-clock-rotate-left"></i>
                 <span class="quick-count" id="recentCount">0</span>
             </button>
+            <button class="quick-btn" data-quick="theme" title="Toggle theme">
+                <i class="fas fa-moon" id="quickThemeIcon"></i>
+            </button>
             <button class="quick-btn" data-quick="command" title="Command Palette (Ctrl+K)">
                 <i class="fas fa-terminal"></i>
             </button>
@@ -71,32 +82,64 @@
         </button>
     </aside>
 
-    <!-- ===== MAIN CONTENT ===== -->
+    <!-- ===== MAIN ===== -->
     <main class="main-content">
 
-        <!-- Hero -->
         <section class="hero" aria-label="Welcome banner">
             <div class="hero-mesh"></div>
-            <div class="hero-content">
-                <div class="breadcrumb" id="breadcrumb">
-                    <span class="breadcrumb-item active" data-action="faculties">🏛️ Faculties</span>
+
+            <div class="hero-inner">
+                <div class="hero-topbar">
+                    <button class="hero-ctrl-btn hero-about-btn" type="button" data-about aria-label="About MU Library">
+                        <i class="fas fa-circle-info"></i>
+                        <span>About</span>
+                    </button>
                 </div>
-                <h1 id="heroTitle">Welcome to <br /><span class="gradient-text">MU Digital Library</span></h1>
-                <p class="hero-subtext" id="heroSubtext">Use the search bar above or browse via the sidebar.</p>
-                <button class="hero-cta" id="openCommandPalette">
-                    <i class="fas fa-search"></i>
-                    <span>Quick search anything…</span>
-                    <kbd>Ctrl</kbd><kbd>K</kbd>
-                </button>
+
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <div class="breadcrumb" id="breadcrumb">
+                            <span class="breadcrumb-item active" data-action="faculties">🏛️ Faculties</span>
+                        </div>
+                        <h1 id="heroTitle">Welcome to <br /><span class="gradient-text">MU Digital Library</span></h1>
+                        <p class="hero-subtext" id="heroSubtext">Use the search bar above or browse via the sidebar.</p>
+                        <button class="hero-cta" id="openCommandPalette">
+                            <i class="fas fa-search"></i>
+                            <span>Quick search anything…</span>
+                            <kbd>Ctrl</kbd><kbd>K</kbd>
+                        </button>
+                    </div>
+
+                    <aside class="hero-contribute" aria-label="Contribute resources">
+                        <div class="hc-glow" aria-hidden="true"></div>
+                        <div class="hc-icon"><i class="fas fa-hand-holding-heart"></i></div>
+                        <span class="hc-eyebrow">Help the library grow</span>
+                        <h3 class="hc-title">Have notes or past papers?</h3>
+                        <p class="hc-text">Send them our way — we credit every contributor.</p>
+                        <button class="hc-btn" type="button" data-contribute>
+                            <i class="fas fa-paper-plane"></i>
+                            Send resources
+                        </button>
+                        <div class="hc-meta">
+                            <span><i class="fas fa-file-pdf"></i> Any PDF</span>
+                            <span><i class="fas fa-user-shield"></i> Full credit</span>
+                        </div>
+                    </aside>
+                </div>
             </div>
         </section>
 
-        <!-- Header toolbar -->
         <header class="header" id="mainHeader">
             <div class="header-left">
                 <button class="hamburger" id="hamburgerBtn" aria-label="Toggle sidebar" aria-expanded="false" aria-controls="sidebar">
                     <i class="fas fa-bars"></i>
                 </button>
+
+                <button class="back-btn-header" id="heroBackBtn" type="button" hidden aria-label="Go back">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Back</span>
+                </button>
+
                 <div class="mobile-brand">
                     <div class="mobile-logo-icon"><i class="fas fa-graduation-cap"></i></div>
                     <span>MU <strong>Library</strong></span>
@@ -109,7 +152,7 @@
             <div class="header-actions">
                 <div class="search-box desktop-search" id="headerSearchContainer" role="search">
                     <i class="fas fa-search" aria-hidden="true"></i>
-                    <input type="text" id="globalSearchInput" placeholder="Search..." autocomplete="off" aria-label="Search" />
+                    <input type="text" id="globalSearchInput" placeholder="Search notes, papers, authors..." autocomplete="off" aria-label="Search" />
                     <button class="clear-btn" id="clearSearchBtn" aria-label="Clear search" hidden>×</button>
                     <button class="search-btn" id="searchBtn" aria-label="Search"><i class="fas fa-arrow-right"></i></button>
                     <div id="searchSuggestions" class="search-suggestions" role="listbox"></div>
@@ -142,25 +185,25 @@
             </div>
         </header>
 
-        <!-- Content -->
         <section class="content-area" id="contentArea" tabindex="-1">
             <div class="strip" id="favoritesStrip" hidden>
-                <div class="strip-header">
+                <div class="strip-header" data-strip-toggle="favorites">
                     <div class="strip-title"><i class="fas fa-star"></i> Favorites</div>
                     <button class="strip-clear" data-clear="favorites"><i class="fas fa-trash-can"></i> Clear All</button>
+                    <i class="fas fa-chevron-down strip-chevron"></i>
                 </div>
                 <div class="strip-body" id="favoritesStripBody"></div>
             </div>
 
             <div class="strip" id="recentStrip" hidden>
-                <div class="strip-header">
+                <div class="strip-header" data-strip-toggle="recent">
                     <div class="strip-title"><i class="fas fa-clock-rotate-left"></i> Recently Viewed</div>
                     <button class="strip-clear" data-clear="recent"><i class="fas fa-trash-can"></i> Clear</button>
+                    <i class="fas fa-chevron-down strip-chevron"></i>
                 </div>
                 <div class="strip-body" id="recentStripBody"></div>
             </div>
 
-            <!-- Filter chips (only shown when a subject is open) -->
             <div class="filters" id="filters" hidden>
                 <button class="filter-chip active" data-filter="all">All</button>
                 <button class="filter-chip" data-filter="syllabus">Syllabus</button>
@@ -169,34 +212,115 @@
                 <button class="filter-chip" data-filter="assignments">Assignments</button>
             </div>
 
+            <div class="sort-bar" id="sortBar" hidden>
+                <span class="sort-label"><i class="fas fa-arrow-down-wide-short"></i> Sort:</span>
+                <button class="sort-chip active" data-sort="default">Default</button>
+                <button class="sort-chip" data-sort="title">Title (A–Z)</button>
+                <button class="sort-chip" data-sort="year-new">Newest year</button>
+                <button class="sort-chip" data-sort="year-old">Oldest year</button>
+            </div>
+
             <div class="card-grid" id="cardGrid"></div>
         </section>
 
-        <!-- Footer -->
+        <!-- ===== FOOTER ===== -->
         <footer class="main-footer">
-            <div class="footer-content">
-                <div class="footer-brand">
-                    <h3>MU <span>Library</span></h3>
-                    <p>Empowering students across all faculties with free access to quality study materials.</p>
+            <div class="footer-inner">
+
+                <!-- Top: multi-column grid -->
+                <div class="footer-top">
+
+                    <!-- Brand column -->
+                    <div class="footer-brand-col">
+                        <a href="#/" class="footer-logo" aria-label="MU Library home">
+                            <div class="footer-logo-icon"><i class="fas fa-graduation-cap"></i></div>
+                            <div>
+                                <h3>MU <span>Library</span></h3>
+                                <p>Free study resources for Mid-West University students across all faculties.</p>
+                            </div>
+                        </a>
+                        <div class="footer-social">
+                            <a href="#" aria-label="GitHub" title="GitHub"><i class="fab fa-github"></i></a>
+                            <a href="#" aria-label="Twitter" title="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" aria-label="LinkedIn" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                            <a href="mailto:hello@mulibrary.example" aria-label="Email" title="Email us"><i class="fas fa-envelope"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Browse column -->
+                    <div class="footer-col">
+                        <h4 class="footer-col-title">Browse</h4>
+                        <ul class="footer-links-list">
+                            <li><a href="#/"><i class="fas fa-house"></i> Home</a></li>
+                            <li><a href="#/be"><i class="fas fa-microchip"></i> BE Engineering</a></li>
+                            <li><a href="#/bsc"><i class="fas fa-flask"></i> BSc Science</a></li>
+                            <li><a href="#/bba"><i class="fas fa-briefcase"></i> BBA Management</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Support column -->
+                    <div class="footer-col">
+                        <h4 class="footer-col-title">Support</h4>
+                        <ul class="footer-links-list">
+                            <li><a href="#/faq"><i class="fas fa-circle-question"></i> FAQ</a></li>
+                            <li><a href="#/about"><i class="fas fa-circle-info"></i> About us</a></li>
+                            <li>
+                                <button type="button" data-contribute>
+                                    <i class="fas fa-paper-plane"></i> Contribute
+                                </button>
+                            </li>
+                            <li>
+                                <a href="mailto:report@mulibrary.example?subject=Broken link report">
+                                    <i class="fas fa-flag"></i> Report a link
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Shortcuts column -->
+                    <div class="footer-col">
+                        <h4 class="footer-col-title">Shortcuts</h4>
+                        <ul class="footer-kbd-list">
+                            <li><span class="kbd-group"><kbd>Ctrl</kbd><kbd>K</kbd></span><span>Command palette</span></li>
+                            <li><span class="kbd-group"><kbd>Ctrl</kbd><kbd>B</kbd></span><span>Toggle sidebar</span></li>
+                            <li><span class="kbd-group"><kbd>Ctrl</kbd><kbd>J</kbd></span><span>Toggle theme</span></li>
+                            <li><span class="kbd-group"><kbd>/</kbd></span><span>Focus search</span></li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="footer-links">
-                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
-                    <a href="#" aria-label="Email"><i class="fas fa-envelope"></i></a>
+
+                <!-- Trust badges -->
+                <div class="footer-trust" aria-label="Why students trust us">
+                    <span class="trust-badge"><i class="fas fa-heart"></i> Free forever</span>
+                    <span class="trust-badge"><i class="fas fa-ban"></i> No ads</span>
+                    <span class="trust-badge"><i class="fas fa-wifi"></i> Works offline</span>
+                    <span class="trust-badge"><i class="fas fa-mobile-screen"></i> Install as app</span>
+                    <span class="trust-badge"><i class="fas fa-shield-halved"></i> No login needed</span>
                 </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 MU Library. Made with <i class="fas fa-heart"></i> for Mid-West University students.</p>
+
+                <!-- Bottom bar -->
+                <div class="footer-bottom">
+                    <p class="footer-copy">
+                        &copy; 2025 MU Library · Built by students, for students
+                    </p>
+                    <div class="footer-bottom-links">
+                        <a href="#/faq">FAQ</a>
+                        <span class="dot-sep" aria-hidden="true">·</span>
+                        <a href="#/about">About</a>
+                        <span class="dot-sep" aria-hidden="true">·</span>
+                        <button type="button" id="footerBackToTop" class="footer-top-link">
+                            <i class="fas fa-arrow-up"></i> Back to top
+                        </button>
+                    </div>
+                </div>
+
             </div>
         </footer>
 
     </main>
 
-    <!-- Sidebar overlay -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- Resource Modal -->
     <div id="resourceModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
         <div class="modal-content">
             <button class="modal-close" aria-label="Close dialog">×</button>
@@ -205,7 +329,6 @@
         </div>
     </div>
 
-    <!-- Command Palette -->
     <div id="commandPalette" class="command-overlay" role="dialog" aria-modal="true" aria-label="Command palette" hidden>
         <div class="command-panel">
             <div class="command-input-wrap">
@@ -222,24 +345,26 @@
         </div>
     </div>
 
-    <!-- Toast container -->
     <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
 
-    <!-- Back to top -->
     <button id="backToTop" class="back-to-top" aria-label="Back to top">
         <i class="fas fa-arrow-up"></i>
     </button>
 
-    <script src="script.js"></script>
-
+    <!-- ============================================================
+         RUNTIME CONFIG — edit these values per environment.
+         ============================================================ -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch((err) => {
-                    console.warn('SW registration failed:', err);
-                });
-            });
-        }
+      window.MU_CONFIG = {
+        chatApiUrl: "http://localhost:8000/chat",
+        sheetApiUrl: "",
+        contributeEmail: "contribute@mulibrary.example",
+        reportEmail: "mu-library@example.com"
+      };
     </script>
+
+    <script src="script.js"></script>
+    <script src="chat.js"></script>
+    <script src="sw-register.js"></script>
 </body>
 </html>

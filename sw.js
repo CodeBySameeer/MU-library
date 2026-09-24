@@ -1,81 +1,95 @@
-// ================================================================
-//  MU Library — Service Worker
-// ================================================================
-//  - Caches the app shell so the site loads offline.
-//  - Uses cache-first for PDFs (once opened, always available).
-//  - Uses network-first for app files, falling back to cache.
-// ================================================================
-
-const CACHE_NAME = "mu-library-v1";
+const CACHE_NAME = "mu-library-v5";
 const SHELL = [
   "./",
   "./index.html",
   "./styles.css",
   "./media.css",
   "./script.js",
+  "./chat.js",
+  "./sw-register.js",
   "./manifest.json",
 ];
+const MAX_CACHE_ENTRIES = 120;
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(SHELL))
-      .then(() => self.skipWaiting())
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      await Promise.allSettled(SHELL.map((url) => cache.add(url)));
+      await self.skipWaiting();
+    })()
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(
-          keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
-        )
-      )
-      .then(() => self.clients.claim())
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k))
+      );
+      await self.clients.claim();
+    })()
   );
 });
+
+self.addEventListener("message", (event) => {
+  if (event.data === "SKIP_WAITING") self.skipWaiting();
+});
+
+async function trimCache() {
+  const cache = await caches.open(CACHE_NAME);
+  const keys = await cache.keys();
+  if (keys.length > MAX_CACHE_ENTRIES) {
+    await Promise.all(
+      keys.slice(0, keys.length - MAX_CACHE_ENTRIES).map((k) => cache.delete(k))
+    );
+  }
+}
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
-
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
+  // Never cache the API
+  if (url.pathname.startsWith("/chat")) return;
+
   if (url.pathname.toLowerCase().endsWith(".pdf")) {
     event.respondWith(
-      caches.match(req).then((hit) => {
-        if (hit) return hit;
-        return fetch(req)
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cached = await cache.match(req);
+        const network = fetch(req)
           .then((res) => {
-            const copy = res.clone();
-            caches.open(CACHE_NAME).then((c) => c.put(req, copy));
+            if (res && res.ok) {
+              cache.put(req, res.clone());
+              event.waitUntil(trimCache());
+            }
             return res;
           })
-          .catch(
-            () =>
-              new Response("Offline — PDF not yet cached.", {
-                status: 503,
-                headers: { "Content-Type": "text/plain" },
-              })
-          );
-      })
+          .catch(() => cached || new Response("Offline", { status: 503 }));
+        return cached || network;
+      })()
     );
     return;
   }
 
   event.respondWith(
-    fetch(req)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then((c) => c.put(req, copy));
+    (async () => {
+      try {
+        const res = await fetch(req);
+        if (res && res.ok && res.type === "basic") {
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(req, res.clone());
+          event.waitUntil(trimCache());
+        }
         return res;
-      })
-      .catch(() =>
-        caches.match(req).then((hit) => hit || caches.match("./index.html"))
-      )
+      } catch {
+        const hit = await caches.match(req);
+        return hit || (await caches.match("./index.html"));
+      }
+    })()
   );
 });
