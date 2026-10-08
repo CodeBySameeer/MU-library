@@ -1,0 +1,1207 @@
+/* ================================================================
+   MU Library — media.css
+   Mobile / tablet specific rules.
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+    .sidebar {
+        transform: translateX(-100%);
+        width: min(88vw, 300px);
+        z-index: 1000;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar.collapsed {
+        width: min(88vw, 300px);
+    }
+
+    .sidebar-close-btn {
+        display: flex;
+    }
+
+    .sidebar-collapse-btn {
+        display: none !important;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 950;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .main-content {
+        margin-left: 0 !important;
+    }
+
+    .hamburger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .mobile-brand {
+        display: flex;
+    }
+
+    .hero-mesh,
+    .bg-grid {
+        display: none;
+    }
+
+    /* Hero */
+    .hero {
+        padding: 22px 16px 24px;
+    }
+
+    .breadcrumb {
+        margin-bottom: 10px;
+    }
+
+    .breadcrumb-item {
+        font-size: 11px;
+        padding: 2px 6px;
+    }
+
+    .hero-eyebrow {
+        font-size: 10.5px;
+        padding: 5px 11px 5px 9px;
+        margin-bottom: 10px;
+    }
+
+    .hero h1 {
+        font-size: 22px;
+        line-height: 1.2;
+        margin-bottom: 8px;
+    }
+
+    .hero-subtext {
+        font-size: 13px;
+        margin-bottom: 16px;
+        line-height: 1.55;
+    }
+
+    .hero-actions {
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+
+    .hero-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 11px 14px;
+        font-size: 12.5px;
+        gap: 7px;
+        min-height: 42px;
+    }
+
+    .hero-btn-ghost kbd {
+        display: none;
+    }
+
+    .hero-trust {
+        gap: 14px;
+        margin-bottom: 2px;
+    }
+
+    .hero-trust li {
+        font-size: 11px;
+    }
+
+    .hero-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px 14px;
+        margin-top: 22px;
+        padding-top: 18px;
+    }
+
+    .hero-stat-value {
+        font-size: 20px;
+    }
+
+    .hero-stat-label {
+        font-size: 9.5px;
+    }
+
+    .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .hero-contribute {
+        display: block;
+        padding: 18px 16px 16px;
+        text-align: left;
+        max-width: none;
+        margin: 0;
+    }
+
+    .hc-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+
+    .hc-eyebrow {
+        display: inline-block;
+        font-size: 9.5px;
+        margin-bottom: 5px;
+    }
+
+    .hc-title {
+        font-size: 14px;
+        margin-bottom: 6px;
+        line-height: 1.3;
+    }
+
+    .hc-text {
+        display: block;
+        font-size: 12px;
+        line-height: 1.5;
+        margin-bottom: 12px;
+    }
+
+    .hc-btn {
+        width: 100%;
+        padding: 10px 14px;
+        font-size: 12.5px;
+        gap: 6px;
+        margin: 0;
+    }
+
+    .hc-meta {
+        display: flex;
+        margin-top: 10px;
+        gap: 12px;
+    }
+
+    .hc-meta span {
+        font-size: 10px;
+    }
+
+    /* Header */
+    .header {
+        padding: 12px 14px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .header-left {
+        flex: 1;
+        min-width: 0;
+        gap: 8px;
+    }
+
+    .hamburger {
+        font-size: 20px;
+        padding: 8px 10px;
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    .back-btn-header {
+        padding: 7px 12px;
+        font-size: 12px;
+        gap: 6px;
+        min-height: 38px;
+    }
+
+    .back-btn-header span {
+        display: none;
+    }
+
+    .back-btn-header i {
+        font-size: 13px;
+    }
+
+    .mobile-brand {
+        font-size: 14px;
+        gap: 8px;
+    }
+
+    .mobile-brand .mobile-logo-icon {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .header h2 {
+        font-size: 14px;
+    }
+
+    .header h2 small {
+        font-size: 11px;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: nowrap;
+    }
+
+    .desktop-search {
+        display: none !important;
+    }
+
+    .mobile-search {
+        display: flex;
+        flex: 1;
+        min-width: 0;
+        max-width: none;
+        padding: 6px 12px;
+        min-height: 42px;
+    }
+
+    .mobile-search input {
+        width: 100%;
+        font-size: 14px;
+        padding: 6px 0;
+    }
+
+    .stats-badge {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+
+    .theme-toggle,
+    .accent-toggle {
+        font-size: 17px;
+        padding: 8px;
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    /* Content */
+    .content-area {
+        padding: 20px 14px 32px;
+    }
+
+    /* Strips */
+    .strip {
+        padding: 14px 14px;
+        border-radius: 14px;
+        margin-bottom: 16px;
+    }
+
+    .strip-header {
+        margin-bottom: 12px;
+        padding: 2px 0;
+        min-height: 32px;
+        gap: 6px;
+    }
+
+    .strip-title {
+        font-size: 13px;
+        gap: 6px;
+    }
+
+    .strip-title i {
+        font-size: 13px;
+    }
+
+    .strip-chevron {
+        font-size: 11px;
+        margin-left: 4px;
+    }
+
+    .strip:not(.collapsed) .strip-header {
+        margin-bottom: 12px;
+    }
+
+    .strip-body {
+        gap: 8px;
+        padding-bottom: 4px;
+    }
+
+    .strip-chip {
+        font-size: 12.5px;
+        padding: 8px 14px;
+        gap: 6px;
+    }
+
+    .strip-chip .chip-name {
+        max-width: 140px;
+    }
+
+    .strip-chip .chip-code {
+        font-size: 10px;
+        padding: 1px 7px;
+    }
+
+    .strip-clear {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    /* Cards */
+    .card-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .card {
+        min-height: 130px;
+        padding: 20px 14px;
+        border-radius: 16px;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: var(--bg-card-solid);
+    }
+
+    .card .card-icon {
+        font-size: 26px;
+        margin-bottom: 8px;
+    }
+
+    .card .card-title {
+        font-size: 13px;
+        line-height: 1.35;
+    }
+
+    .card .card-subtitle {
+        font-size: 11px;
+        margin-top: 3px;
+    }
+
+    .card .card-badge {
+        font-size: 9px;
+        padding: 2px 9px;
+        top: 8px;
+        right: 8px;
+    }
+
+    .card .fav-btn {
+        top: 6px;
+        left: 6px;
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+    .card .copy-link-btn {
+        top: 6px;
+        right: 38px;
+        width: 26px;
+        height: 26px;
+        font-size: 11px;
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .card.subject-card .card-tags {
+        display: none;
+    }
+
+    /* Resource groups */
+    .res-group {
+        padding: 16px 16px;
+        border-radius: 14px;
+    }
+
+    .res-group-head {
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+        min-height: 34px;
+        gap: 10px;
+    }
+
+    .res-group-head i:first-child {
+        font-size: 15px;
+        width: 20px;
+    }
+
+    .res-group-head h4 {
+        font-size: 14px;
+    }
+
+    .res-group-head .count {
+        font-size: 10px;
+        padding: 2px 9px;
+    }
+
+    .res-chevron {
+        font-size: 11px;
+        padding-left: 6px;
+    }
+
+    .res-list {
+        gap: 8px;
+    }
+
+    /* Resource items */
+    .res-item {
+        padding: 12px 14px;
+        font-size: 13px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .res-item>i {
+        font-size: 15px;
+        width: 18px;
+    }
+
+    .res-item .res-info {
+        flex-basis: calc(100% - 34px);
+    }
+
+    .res-item .res-title {
+        font-size: 13px;
+        white-space: normal;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .res-item .res-meta {
+        font-size: 11px;
+        margin-top: 5px;
+    }
+
+    .res-actions {
+        width: 100%;
+        margin-top: 4px;
+        gap: 6px;
+    }
+
+    .res-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 9px 10px;
+        font-size: 12px;
+        gap: 5px;
+        min-height: 38px;
+    }
+
+    .res-btn.icon-only {
+        padding: 8px 10px;
+        flex: 0 0 auto;
+        min-width: 38px;
+    }
+
+    .res-btn i {
+        font-size: 11px;
+    }
+
+    /* Filters */
+    .filters {
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .filter-chip {
+        font-size: 12px;
+        padding: 7px 14px;
+    }
+
+    .sort-bar {
+        padding: 8px 12px;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+
+    .sort-label {
+        font-size: 11px;
+        gap: 4px;
+    }
+
+    .sort-chip {
+        font-size: 11.5px;
+        padding: 5px 11px;
+    }
+
+    /* Subject progress */
+    .subject-progress {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 14px 16px;
+        margin-bottom: 16px;
+    }
+
+    .subject-progress-info {
+        font-size: 12.5px;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .subject-progress-info i {
+        font-size: 14px;
+    }
+
+    /* Footer */
+    .main-footer {
+        padding: 36px 20px 20px;
+    }
+
+    .footer-top {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding-bottom: 28px;
+    }
+
+    .footer-brand-col {
+        gap: 16px;
+    }
+
+    .footer-logo {
+        gap: 12px;
+    }
+
+    .footer-logo-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+    }
+
+    .footer-logo h3 {
+        font-size: 18px;
+    }
+
+    .footer-logo p {
+        font-size: 12.5px;
+        margin-top: 6px;
+        max-width: 100%;
+    }
+
+    .footer-social {
+        gap: 8px;
+    }
+
+    .footer-social a {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .footer-col {
+        padding-top: 20px;
+        border-top: 1px dashed var(--border-color);
+    }
+
+    .footer-col:first-of-type {
+        padding-top: 0;
+        border-top: none;
+    }
+
+    .footer-col-title {
+        font-size: 11px;
+        margin-bottom: 14px;
+    }
+
+    .footer-links-list a,
+    .footer-links-list button {
+        font-size: 13px;
+        padding: 10px 10px;
+        margin-left: -10px;
+        min-height: 40px;
+    }
+
+    .footer-links-list a i,
+    .footer-links-list button i {
+        font-size: 12px;
+        width: 16px;
+    }
+
+    .footer-kbd-list {
+        gap: 12px;
+    }
+
+    .footer-kbd-list li {
+        font-size: 12.5px;
+    }
+
+    .footer-kbd-list kbd {
+        font-size: 10px;
+        padding: 3px 6px;
+        min-width: 22px;
+    }
+
+    .footer-trust {
+        gap: 8px;
+        padding: 22px 0;
+    }
+
+    .trust-badge {
+        font-size: 11.5px;
+        padding: 7px 13px;
+        gap: 6px;
+    }
+
+    .trust-badge i {
+        font-size: 11px;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        text-align: center;
+        gap: 12px;
+        padding-top: 18px;
+        font-size: 12px;
+    }
+
+    .footer-bottom-links {
+        justify-content: center;
+        gap: 8px;
+    }
+
+    /* FAQ */
+    .faq-hero {
+        padding: 12px 14px 32px;
+    }
+
+    .faq-hero-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+        border-radius: 16px;
+        margin-bottom: 18px;
+    }
+
+    .faq-hero h1 {
+        font-size: 24px;
+        margin-bottom: 12px;
+    }
+
+    .faq-hero p {
+        font-size: 13.5px;
+        margin-bottom: 20px;
+        line-height: 1.65;
+    }
+
+    .faq-search {
+        padding: 11px 16px;
+        min-height: 44px;
+    }
+
+    .faq-search input {
+        font-size: 14px;
+    }
+
+    .faq-list {
+        gap: 10px;
+    }
+
+    .faq-item summary {
+        padding: 15px 16px;
+        gap: 12px;
+        font-size: 13.5px;
+        line-height: 1.4;
+    }
+
+    .faq-item-icon {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+        border-radius: 10px;
+    }
+
+    .faq-item-body {
+        padding: 0 16px 16px 62px;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .faq-footer-cta {
+        padding: 28px 20px;
+        margin-top: 28px;
+    }
+
+    .faq-footer-cta h3 {
+        font-size: 17px;
+    }
+
+    .faq-footer-cta p {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .faq-cta-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .faq-cta-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 13.5px;
+    }
+
+    /* About */
+    .about-hero-new {
+        padding: 24px 16px 44px;
+    }
+
+    .about-title {
+        font-size: 30px;
+        margin-bottom: 20px;
+    }
+
+    .about-lede {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .about-block {
+        padding: 40px 16px;
+    }
+
+    .about-block-head {
+        margin-bottom: 28px;
+    }
+
+    .goal-item {
+        grid-template-columns: 40px 44px 1fr;
+        gap: 14px;
+        padding: 22px 0;
+    }
+
+    .goal-number {
+        font-size: 16px;
+        padding-top: 6px;
+    }
+
+    .goal-icon {
+        width: 42px;
+        height: 42px;
+        font-size: 16px;
+        border-radius: 11px;
+    }
+
+    .goal-content h4 {
+        font-size: 14.5px;
+        margin-bottom: 6px;
+    }
+
+    .goal-content p {
+        font-size: 13px;
+        line-height: 1.65;
+    }
+
+    .team-row {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .member {
+        padding: 22px 16px;
+    }
+
+    .member-avatar {
+        width: 76px;
+        height: 76px;
+        font-size: 24px;
+        margin-bottom: 14px;
+    }
+
+    .contact-pill {
+        padding: 11px 18px;
+        font-size: 13px;
+        gap: 8px;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .about-cta {
+        margin: 32px 16px;
+        padding: 36px 22px;
+    }
+
+    .about-cta h3 {
+        font-size: 19px;
+        margin-bottom: 12px;
+    }
+
+    .about-cta p {
+        font-size: 13.5px;
+        margin-bottom: 24px;
+    }
+
+    .cta-button {
+        width: 100%;
+        justify-content: center;
+        padding: 14px 24px;
+        font-size: 14px;
+    }
+
+    /* Toasts */
+    .toast-container {
+        bottom: 16px;
+        right: 14px;
+        left: 14px;
+        max-width: none;
+        gap: 10px;
+    }
+
+    .toast {
+        min-width: auto;
+        max-width: none;
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+
+    /* Install banner */
+    .install-banner {
+        bottom: 12px;
+        padding: 12px 16px;
+        gap: 12px;
+    }
+
+    .install-banner .ib-text small {
+        display: none;
+    }
+
+    /* Command palette */
+    .command-overlay {
+        padding: 6vh 12px 12px;
+    }
+
+    .command-input-wrap {
+        padding: 14px 18px;
+        gap: 12px;
+    }
+
+    .command-input-wrap input {
+        font-size: 15px;
+    }
+
+    .command-results {
+        max-height: 50vh;
+        padding: 8px;
+    }
+
+    .command-footer {
+        display: none;
+    }
+
+    .command-item {
+        padding: 11px 12px;
+        gap: 12px;
+    }
+
+    .command-item .cmd-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .command-item .cmd-name {
+        font-size: 13.5px;
+    }
+
+    /* Chat */
+    .chat-fab {
+        right: 16px;
+        bottom: 84px;
+        width: 52px;
+        height: 52px;
+        font-size: 22px;
+    }
+
+    .chat-hint {
+        right: 76px;
+        bottom: 90px;
+        font-size: 12px;
+        padding: 10px 30px 10px 14px;
+        max-width: 180px;
+        border-radius: 12px;
+    }
+
+    .chat-hint::after {
+        bottom: 16px;
+    }
+
+    .chat-panel {
+        right: 10px;
+        left: 10px;
+        bottom: 148px;
+        width: auto;
+        max-width: none;
+        height: auto;
+        max-height: calc(100vh - 180px);
+        border-radius: 18px;
+    }
+
+    .chat-header {
+        padding: 14px 16px;
+        gap: 10px;
+    }
+
+    .chat-avatar {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+    }
+
+    .chat-title {
+        font-size: 13.5px;
+    }
+
+    .chat-status {
+        font-size: 10.5px;
+    }
+
+    .chat-body {
+        padding: 14px 14px 8px;
+        gap: 12px;
+    }
+
+    .chat-msg-content {
+        max-width: 88%;
+    }
+
+    .chat-msg-bubble {
+        font-size: 13px;
+        padding: 10px 13px;
+    }
+
+    .chat-chip {
+        font-size: 12px;
+        padding: 6px 11px;
+    }
+
+    .chat-input-row {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .chat-input-row input {
+        font-size: 13.5px;
+        padding: 9px 14px;
+    }
+
+    .chat-send {
+        width: 38px;
+        height: 38px;
+        font-size: 12px;
+    }
+
+    .chat-footer {
+        font-size: 10px;
+        padding: 8px 12px;
+    }
+
+    /* Back to top */
+    .back-to-top {
+        bottom: 20px;
+        right: 16px;
+        width: 42px;
+        height: 42px;
+        font-size: 16px;
+    }
+
+    /* Contribute modal */
+    .contrib-overlay {
+        padding: 12px;
+        align-items: flex-end;
+    }
+
+    .contrib-panel {
+        padding: 26px 20px 22px;
+        max-height: 92vh;
+        border-radius: var(--radius-xl);
+    }
+
+    .contrib-head {
+        margin-bottom: 20px;
+    }
+
+    .contrib-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+        margin-bottom: 12px;
+    }
+
+    .contrib-head h3 {
+        font-size: 18px;
+    }
+
+    .contrib-head p {
+        font-size: 13px;
+    }
+
+    .contrib-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .contrib-drop {
+        padding: 22px 14px;
+    }
+
+    .contrib-drop i {
+        font-size: 24px;
+    }
+
+    .contrib-drop p {
+        font-size: 13px;
+    }
+
+    .contrib-drop small {
+        font-size: 11.5px;
+    }
+
+    .contrib-note {
+        font-size: 11.5px;
+    }
+
+    .contrib-submit {
+        padding: 13px 20px;
+        font-size: 13.5px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .card {
+        min-height: 120px;
+        padding: 22px 18px;
+    }
+
+    .card .card-title {
+        font-size: 14px;
+    }
+
+    .hero h1 {
+        font-size: 20px;
+    }
+
+    .hero-subtext {
+        font-size: 12.5px;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+    }
+
+    .hero-btn {
+        width: 100%;
+    }
+
+    .hero-trust {
+        gap: 12px;
+    }
+
+    .hero-trust li {
+        font-size: 10.5px;
+    }
+
+    .hero-stat-value {
+        font-size: 18px;
+    }
+
+    .header h2 small {
+        display: none;
+    }
+
+    .stats-badge {
+        display: none;
+    }
+
+    .mobile-brand span {
+        display: none;
+    }
+
+    .breadcrumb-item {
+        font-size: 10.5px;
+    }
+
+    .team-row {
+        grid-template-columns: 1fr;
+    }
+
+    .hero {
+        padding: 20px 14px 22px;
+    }
+
+    .hc-title {
+        font-size: 13.5px;
+    }
+
+    .hc-btn {
+        font-size: 12px;
+        padding: 9px 12px;
+    }
+
+    .hc-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .chat-panel {
+        right: 8px;
+        left: 8px;
+        bottom: 140px;
+        max-height: calc(100vh - 170px);
+    }
+
+    .chat-hint {
+        display: none;
+    }
+
+    .strip-chip .chip-name {
+        max-width: 120px;
+    }
+
+    .res-btn-label {
+        display: none;
+    }
+
+    .res-btn.view,
+    .res-btn.download {
+        padding: 8px 12px;
+        min-width: 40px;
+    }
+
+    .faq-hero h1 {
+        font-size: 22px;
+    }
+
+    .about-title {
+        font-size: 26px;
+    }
+
+    .goal-item {
+        grid-template-columns: 32px 40px 1fr;
+        gap: 10px;
+        padding: 18px 0;
+    }
+
+    .goal-number {
+        font-size: 14px;
+    }
+
+    .goal-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 14px;
+    }
+}
