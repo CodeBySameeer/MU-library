@@ -1,21 +1,12 @@
 // ================================================================
-//  MU Library — chat.js
-//  AI-first assistant with rotating speech bubble hint.
-//
-//  Wrapped in an IIFE so it does NOT leak top-level names. In
-//  particular we avoid re-declaring `MU_CONFIG`, which is already
-//  declared as a top-level `const` in script.js — two top-level
-//  `const` declarations with the same name in the same page throw
-//  a SyntaxError and would kill this entire file (bot vanishes).
+//  MU Library — chat.js (100% Local / No Backend Required)
+//  Uses a keyword-scoring engine to answer questions locally.
 // ================================================================
 
 (function () {
   "use strict";
 
-  const MU_CHAT_CFG = window.MU_CONFIG || {};
-  const CHAT_API_URL = MU_CHAT_CFG.chatApiUrl || "http://localhost:8000/chat";
   const CHAT_BOT_NAME = "Library Assistant";
-
   const Lib = window.MULibrary || {};
 
   // Rotating hints shown in the speech bubble
@@ -30,43 +21,109 @@
   const HINT_ROTATE_MS = 6000;
   const HINT_FIRST_DELAY_MS = 2000;
 
+  // ==============================================================
+  //  THE "BRAIN" - FAQ & KEYWORD MATCHING
+  // ==============================================================
   const FAQ = [
     {
-      match: ["how do i download", "how to download", "save pdf"],
+      // Greetings
+      match: [
+        "hello",
+        "hii",
+        "hey",
+        "namaste",
+        "greetings",
+        "morning",
+        "evening",
+      ],
+      greeting: true,
       reply:
-        "Tap **Download** on any file row. It saves to your device's Downloads folder.\n\nOnce downloaded, files work offline — no internet needed.",
+        "Namaste! 👋 Ask me anything about the library — subjects, downloads, how to contribute, or anything else.",
+      chips: ["What subjects do you have?", "How do I download?"],
+    },
+    {
+      // Subjects, Faculties, Notes, Papers
+      match: [
+        "subject",
+        "faculty",
+        "course",
+        "civil",
+        "computer",
+        "hydropower",
+        "physics",
+        "chemistry",
+        "bba",
+        "semester",
+        "notes",
+        "paper",
+        "syllabus",
+        "assignment",
+        "study",
+        "material",
+        "browse",
+      ],
+      reply:
+        "Currently we have files for:\n• **BE Civil** (Semesters 1-2)\n• **BE Computer** (Semester 1)\n\nOther faculties (BE Hydropower, BSc Physics, BSc Chemistry, BBA) are listed but mostly empty for now.\n\nUse the **search bar** or **sidebar** to browse!",
+      chips: ["How do I download?", "How can I contribute?"],
+    },
+    {
+      // Downloads and Offline
+      match: [
+        "download",
+        "save",
+        "offline",
+        "pdf",
+        "file",
+        "internet",
+        "cache",
+        "view",
+      ],
+      reply:
+        "Tap **Download** on any file row. It saves to your device's Downloads folder.\n\nOnce downloaded, files work **offline** — no internet needed.",
       chips: ["How do I use offline?", "What subjects do you have?"],
     },
     {
-      match: ["how do i use offline", "offline", "without internet"],
+      // Contribute / Upload / Share
+      match: [
+        "contribute",
+        "upload",
+        "send",
+        "share",
+        "submit",
+        "resource",
+        "provide",
+      ],
       reply:
-        "Every file you open once is cached by the browser. Next time, it works without internet.\n\nYou can also **install MU Library** as an app.",
-      chips: ["How do I install it?"],
-    },
-    {
-      match: ["how do i install", "install app", "add to home"],
-      reply:
-        "**Install MU Library:**\n\n• Android Chrome: Menu (⋮) → Install app\n• iPhone Safari: Share → Add to Home Screen\n• Desktop: install icon in the address bar",
-      chips: ["What subjects do you have?"],
-    },
-    {
-      match: ["how can i contribute", "contribute", "send notes", "upload"],
-      reply: "Tap the button below to open the contribution form.",
+        "To contribute resources, please tap the **'Send resources'** button in the hero section of the homepage.",
       action: "contribute",
       actionLabel: "Open contribution form",
     },
     {
-      match: ["report", "broken link", "not working"],
+      // Report Broken Links
+      match: ["report", "broken", "error", "flag", "missing", "dead"],
       reply:
-        "Every file has a small 🚩 flag button — tap it to report a broken link.",
+        "To report a broken link, find the file in the list and click the **small flag button** next to it. We'll fix it soon!",
       action: "report",
       actionLabel: "Report a broken link",
     },
     {
-      match: ["hello", "hi", "hey", "namaste"],
-      greeting: true,
+      // Site Info, Free, Ads, Install
+      match: [
+        "free",
+        "cost",
+        "price",
+        "pay",
+        "paid",
+        "money",
+        "login",
+        "account",
+        "ads",
+        "install",
+        "android",
+        "iphone",
+      ],
       reply:
-        "Namaste! 👋 Ask me anything about the library — subjects, downloads, how to contribute, or anything else.",
+        "MU Library is completely **free**. There is no login required, and there are no ads.\n\nYou can also install it as an app from your browser menu!",
       chips: ["What subjects do you have?", "How do I download?"],
     },
   ];
@@ -83,6 +140,9 @@
   let hintTimer = null;
   let hintIndex = 0;
 
+  // ==============================================================
+  //  UI BUILDING & EVENTS
+  // ==============================================================
   function buildChat() {
     if (document.getElementById("chatRoot"))
       return document.getElementById("chatRoot");
@@ -143,10 +203,12 @@
 
     fab.addEventListener("click", toggleChat);
     closeBtn.addEventListener("click", () => closeChat());
+
     hint.addEventListener("click", (e) => {
       if (e.target.closest("#chatHintClose")) return;
       openChat();
     });
+
     hintClose.addEventListener("click", (e) => {
       e.stopPropagation();
       hideHint();
@@ -279,7 +341,7 @@
   }
 
   // ==============================================================
-  //  RENDERING
+  //  RENDERING HELPERS
   // ==============================================================
   function escapeChatHtml(str) {
     return String(str).replace(
@@ -294,6 +356,7 @@
         }[c])
     );
   }
+
   function inlineMd(text) {
     let safe = escapeChatHtml(text);
     safe = safe.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
@@ -301,10 +364,12 @@
     safe = safe.replace(/\n/g, "<br>");
     return safe;
   }
+
   function scrollChat() {
     const body = document.getElementById("chatBody");
     if (body) body.scrollTop = body.scrollHeight;
   }
+
   function addBubble(
     role,
     html,
@@ -321,6 +386,7 @@
         ? `<div class="chat-msg-avatar"><i class="fas fa-robot"></i></div>`
         : "";
     const bubbleHtml = `<div class="chat-msg-bubble">${html}</div>`;
+
     let chipsHtml = "";
     if (chips.length) {
       chipsHtml = `<div class="chat-chips">${chips
@@ -332,18 +398,21 @@
         )
         .join("")}</div>`;
     }
+
     let actionHtml = "";
     if (action && actionLabel) {
       actionHtml = `<div class="chat-chips"><button type="button" class="chat-chip chat-chip-action" data-chat-action="${escapeChatHtml(
         action
       )}">${escapeChatHtml(actionLabel)}</button></div>`;
     }
+
     wrap.innerHTML =
       avatarHtml +
       `<div class="chat-msg-content">${bubbleHtml}${chipsHtml}${actionHtml}</div>`;
     body.appendChild(wrap);
     scrollChat();
   }
+
   function showTyping(label = "Thinking…") {
     const body = document.getElementById("chatBody");
     if (!body) return;
@@ -360,6 +429,7 @@
     body.appendChild(el);
     scrollChat();
   }
+
   function hideTyping() {
     document.getElementById("chatTyping")?.remove();
   }
@@ -378,7 +448,7 @@
   }
 
   // ==============================================================
-  //  MAIN HANDLER
+  //  MAIN MESSAGE HANDLER
   // ==============================================================
   async function handleUserMessage(text) {
     const trimmed = text.trim();
@@ -409,12 +479,18 @@
       return respondWithFacultyList();
     }
 
-    // --- FAQ fast-path (works on any message) ---
+    // --- Local Brain (Keyword Matching) ---
     const faqHit = matchFaq(trimmed, {
       allowGreeting: chatState.history.length === 1,
     });
+
     if (faqHit) {
-      await sleep(250);
+      chatState.busy = true;
+      showTyping("Typing…");
+      await sleep(600); // Fake realistic delay
+      hideTyping();
+      chatState.busy = false;
+
       addBubble(
         "assistant",
         inlineMd(faqHit.reply),
@@ -426,48 +502,16 @@
       return;
     }
 
-    // --- LLM ---
-    if (CHAT_API_URL) {
-      showTyping("Thinking…");
-      chatState.busy = true;
-      try {
-        const reply = await callBackend(chatState.history);
-        hideTyping();
-        chatState.busy = false;
-        if (reply) {
-          chatState.history.push({ role: "assistant", content: reply });
-          addBubble("assistant", inlineMd(reply), [
-            "Find a subject",
-            "How can I contribute?",
-          ]);
-          return;
-        }
-        addBubble(
-          "assistant",
-          "The AI returned an empty response. Try again in a moment.",
-          ["Find a subject", "How do I download?"]
-        );
-      } catch (err) {
-        hideTyping();
-        chatState.busy = false;
-        console.warn("[Chat] Backend failed:", err);
-        addBubble(
-          "assistant",
-          `I couldn't reach the AI just now. In the meantime:`,
-          [
-            "Find a subject",
-            "How do I download?",
-            "How can I contribute?",
-            "Report a broken link",
-          ]
-        );
-      }
-      return;
-    }
+    // --- Fallback if no keywords matched ---
+    chatState.busy = true;
+    showTyping("Typing…");
+    await sleep(600);
+    hideTyping();
+    chatState.busy = false;
 
     addBubble(
       "assistant",
-      "I'm not sure about that one. Here's what I can do:",
+      "I'm not sure about that exact question. Here are some things I can help you with:",
       [
         "Find a subject",
         "How do I download?",
@@ -516,47 +560,45 @@
     }
   }
 
+  // ==============================================================
+  //  MATCHING ENGINE
+  // ==============================================================
   function matchFaq(text, { allowGreeting = false } = {}) {
-    const t = " " + text.toLowerCase().trim() + " ";
-    let best = null,
-      bestScore = 0;
+    const t = text.toLowerCase();
+    let best = null;
+    let bestScore = 0;
+
     for (const item of FAQ) {
       if (item.greeting && !allowGreeting) continue;
+
       let score = 0;
       for (const kw of item.match) {
-        const needle = " " + kw.toLowerCase() + " ";
-        if (t.includes(needle)) score += kw.length * 2;
+        // \b ensures it only matches the exact word (e.g. "hi" won't match "this")
+        const regex = new RegExp("\\b" + kw + "\\b", "i");
+
+        if (regex.test(t)) {
+          // Longer keywords give a higher score (e.g., "download" > "save")
+          score += kw.length;
+        }
       }
+
       if (score > bestScore) {
         best = item;
         bestScore = score;
       }
     }
-    return bestScore >= 4 ? best : null;
-  }
 
-  async function callBackend(history) {
-    const res = await fetch(CHAT_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ messages: history }),
-    });
-    if (!res.ok) {
-      let detail = `HTTP ${res.status}`;
-      try {
-        const data = await res.json();
-        if (data && data.detail) detail = data.detail;
-      } catch {}
-      throw new Error(detail);
-    }
-    const data = await res.json();
-    return data.reply || "";
+    // Requires a minimum score of 3 to trigger a match
+    return bestScore >= 3 ? best : null;
   }
 
   function sleep(ms) {
     return new Promise((r) => setTimeout(r, ms));
   }
 
+  // ==============================================================
+  //  BOOT
+  // ==============================================================
   (function bootChat() {
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", buildChat);
